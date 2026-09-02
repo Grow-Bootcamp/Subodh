@@ -80,19 +80,30 @@ const hoistingDemo = function () {
     console.log(hoisting)
 }()
 
+
 const coreMethodsDemo = function () {
     console.log(coreMethods)
 
-    // Array: map, filter, reduce, find, indexOf
+    // Array: map, filter, reduce, find, join, toString, slice, splice
     let demoArray = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+    demoArray.map((num) => {
+        num * 10
+    })
+    console.log(demoArray)
+
+    demoArray.filter(num => {
+        num < 90
+    })
+    console.log(demoArray)
 
     // Object: keys, values, entries
     let demoObject = {};
 
-    // String: includes, slice, trim, toLowercase
+    // String: includes, slice, trim, toLowercase. split, toLowerCase, toUpperCase
     let demoString = 'Subodh is currently at CloudTech Dhangadhi branch'
 
-    // Number: parseint
+    // Number: toString, toFixed, Math.floor, Math.round, Math.random 
     console.log(coreMethods)
 }()
 

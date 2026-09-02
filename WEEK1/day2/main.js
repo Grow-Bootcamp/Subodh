@@ -221,7 +221,7 @@ const asyncTaskQueue = function () {
         { name: 'Send notification', duration: 800 },
     ]
 
-    const executeTask = (task) {
+    const executeTask = (task) => {
         return new Promise((resolve) => {
             console.log(`[START] ${task.name}`)
             setTimeout(() => {

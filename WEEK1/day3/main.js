@@ -205,20 +205,17 @@ console.log(productArray.find((item) => item.length >= 5));
 // Inventory Analytics Engine for Any E-Commerce Website
 
 const inventoryAnalyticsEngine = function () {
-  let grossRevenue = 0;
-  let totalValuation = 0;
-
   //Used filter, reduce
   const calculateGrossRevenue = (orders) => {
     let completedorders = orders.filter((order) => {
       return order.status === "completed";
     });
-    grossRevenue = completedorders.reduce((accumulator, current) => {
+    let grossRevenue = completedorders.reduce((accumulator, current) => {
       current.items.forEach((item) => {
         accumulator += item.quantity * item.unitPrice;
       });
       return accumulator;
-    }, grossRevenue);
+    }, 0);
     return grossRevenue;
   };
 
@@ -235,9 +232,12 @@ const inventoryAnalyticsEngine = function () {
 
   //Used Object.values(), reduce()
   const totalAssetValuation = (inventory) => {
-    totalValuation = Object.values(inventory).reduce((accumulator, current) => {
-      return (accumulator += current.price * current.stock);
-    }, totalValuation);
+    let totalValuation = Object.values(inventory).reduce(
+      (accumulator, current) => {
+        return (accumulator += current.price * current.stock);
+      },
+      0,
+    );
     return totalValuation;
   };
 
@@ -265,8 +265,10 @@ const inventoryAnalyticsEngine = function () {
 
   //Used Objects.keys(). Objects.values(), Array.map(), Array.join()
   const csvFomatter = (inventory) => {
-    let csvKeys = Object.keys(Object.values(inventory)[0]).join(",");
-    let csvValues = Object.values(inventory)
+    let entries = entries;
+    if (entries.length === 0) return "";
+    let csvKeys = Object.keys(entries[0]).join(",");
+    let csvValues = entries
       .map((item) => {
         return Object.values(item).join(",");
       })

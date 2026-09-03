@@ -265,7 +265,7 @@ const inventoryAnalyticsEngine = function () {
 
   //Used Objects.keys(). Objects.values(), Array.map(), Array.join()
   const csvFomatter = (inventory) => {
-    let entries = entries;
+    let entries = Object.values(inventory);
     if (entries.length === 0) return "";
     let csvKeys = Object.keys(entries[0]).join(",");
     let csvValues = entries

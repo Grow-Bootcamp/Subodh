@@ -166,3 +166,65 @@ const cart1 = {
 };
 
 cart1.getDescription();
+
+// Cookies vs Sessions vs LocalStorage
+
+/*Local Storage
+- Persistent Client Storage
+- 5-10 MB
+- Client Side only
+- Persistent app settings, preferences
+*/
+
+//CREATE
+localStorage.setItem("user", JSON.stringify({ name: "Subodh", age: 21 }));
+//READ
+const user = JSON.parse(localStorage.getItem("user"));
+console.log(user.name);
+//UPDATE
+user.name = "Samit";
+localStorage.setItem("user", JSON.stringify(user));
+//DELETE
+localStorage.removeItem("user"); //Removes 'user' key
+localStorage.clear(); //Clears all keys in localStorage
+
+/* Session Storage
+- Temp Tab Scoped Storage
+- 5MB
+- Useful in cases such as multi-step form
+- Client side only
+ */
+
+//CREATE
+sessionStorage.setItem("token", "uk-123-session");
+//READ
+const token = sessionStorage.getItem("token");
+console.log(token);
+// UPDATE
+sessionStorage.setItem("token", "us-124-sessionUpdate");
+//DELETE
+sessionStorage.removeItem("token");
+sessionStorage.clear();
+
+/*Cookies
+- Server Readable and Expirable Storage(It has lifetime)
+- 4KB
+- Sent Automatially with every http req
+- For authentication tokens, session id
+*/
+
+//CREATE - Lifetime of 7 days(Due to 7*24*60*60)
+document.cookie =
+  "username=Subodh; max-age=" +
+  7 * 24 * 60 * 60 +
+  "; path=/; SameSite=Strict; Secure";
+
+//READ
+console.log(document.cookie); //Output: "username=Subodh"
+
+//UPDATE
+document.cookie =
+  "username=SubodhShah; max-age=" + 7 * 24 * 60 * 60 + "; path=/";
+
+//DELETE - Just set max-age to 0
+document.cookie = "username=SubodhShah; max-age=0; path=/";

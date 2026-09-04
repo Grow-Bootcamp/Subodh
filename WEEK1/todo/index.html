@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App -- GrowBootcamp</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header class="heading">Todo App</header>
+
+        <div class="inputSection">
+            <input type="text" id="todoInput" placeholder="What needs to be done?" autofocus>
+            <button id="addBtn">Add</button>
+        </div>
+
+        <div class="filterSection">
+            <button class="filterBtn active" data-filter="all">All</button>
+            <button class="filterBtn" data-filter="active">Active</button>
+            <button class="filterBtn" data-filter="completed">Completed</button>
+        </div>
+
+        <ul id="todoList"></ul>
+
+        <footer class="footerSection">
+            <span id="todoCount">0 items left</span>
+            <button id="clearCompleted">Clear Completed</button>
+        </footer>
+    </div>
+    <script src="./main.js"></script>
+</body>
+
+</html>

@@ -138,14 +138,6 @@ body {
     color: #333;
 }
 
-.todoTag {
-    font-size: 0.75rem;
-    padding: 0.15rem 0.5rem;
-    background-color: #e8f0fe;
-    color: #4a90d9;
-    border-radius: 12px;
-}
-
 .deleteBtn {
     padding: 0.25rem 0.5rem;
     font-size: 0.85rem;

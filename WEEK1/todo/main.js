@@ -5,9 +5,6 @@ const TodoApp = (() => {
     let currentFilter = "all";
     let nextId = 1;
 
-    // Set — tracks unique tags across all todos
-    const tagRegistry = new Set();
-
     // Map — quick lookup of todo by ID
     const todoMap = new Map();
 
@@ -40,10 +37,9 @@ const TodoApp = (() => {
             todos = data.todos;
             nextId = data.nextId || 1;
 
-            // Rebuild Map and Set from loaded data
+            // Rebuild Map from loaded data
             todos.forEach((todo) => {
                 todoMap.set(todo.id, todo);
-                todo.tags.forEach((tag) => tagRegistry.add(tag));
             });
 
             console.log("Loaded from localStorage:", todos.length, "todos");
@@ -69,8 +65,8 @@ const TodoApp = (() => {
     const clearCompletedBtn = document.getElementById("clearCompleted");
     const filterBtns = document.querySelectorAll(".filterBtn");
 
-    // --- Rest Parameters — flexible tag input ---
-    const createTodo = (...tags) => {
+    // --- Create a new todo ---
+    const createTodo = () => {
         const text = todoInput.value.trim();
         if (!text) return;
 
@@ -78,19 +74,17 @@ const TodoApp = (() => {
             id: nextId++,
             text,
             completed: false,
-            tags: [...tags], // Spread — copy tags array immutably
             createdAt: new Date().toISOString(),
         };
 
         // Spread — add new todo without mutating original array
         todos = [...todos, todo];
 
-        // Update Map and Set
+        // Update Map
         todoMap.set(todo.id, todo);
-        tags.forEach((tag) => tagRegistry.add(tag));
 
         todoInput.value = "";
-        saveToLocalStorage(); // Persist after create
+        saveToLocalStorage();
         render();
         debugLog();
     };
@@ -172,7 +166,6 @@ const TodoApp = (() => {
                     ${todo.completed ? "checked" : ""}
                     onchange="TodoApp.toggleTodo(${todo.id})">
                 <span class="todoText">${todo.text}</span>
-                ${todo.tags.map((tag) => `<span class="todoTag">${tag}</span>`).join("")}
                 <button class="deleteBtn" onclick="TodoApp.deleteTodo(${todo.id})">Delete</button>
             </li>
         `
@@ -194,7 +187,6 @@ const TodoApp = (() => {
     // --- console.table() for debugging ---
     const debugLog = () => {
         console.table(todos);
-        console.log("Tag Registry (Set):", [...tagRegistry]);
         console.log("Todo Map size:", todoMap.size);
     };
 
@@ -213,11 +205,11 @@ const TodoApp = (() => {
 
 // --- Event Listeners using Arrow Functions ---
 document.getElementById("addBtn").addEventListener("click", () => {
-    TodoApp.createTodo("general");
+    TodoApp.createTodo();
 });
 
 document.getElementById("todoInput").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") TodoApp.createTodo("general");
+    if (e.key === "Enter") TodoApp.createTodo();
 });
 
 // --- Filter button event listeners ---

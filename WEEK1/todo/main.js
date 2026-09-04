@@ -69,6 +69,43 @@ const TodoApp = (() => {
         debugLog();
     };
 
+    // --- Array.filter() — filter todos by status ---
+    const getFilteredTodos = () => {
+        if (currentFilter === "active") {
+            return todos.filter((todo) => !todo.completed);
+        }
+        if (currentFilter === "completed") {
+            return todos.filter((todo) => todo.completed);
+        }
+        return [...todos]; // Spread — return copy, not reference
+    };
+
+    // --- Set filter and re-render ---
+    const setFilter = (filter) => {
+        currentFilter = filter;
+
+        // Update active button class
+        filterBtns.forEach((btn) => {
+            btn.classList.toggle("active", btn.dataset.filter === filter);
+        });
+
+        render();
+    };
+
+    // --- Clear completed todos ---
+    const clearCompleted = () => {
+        // Keep only active todos
+        const activeTodos = todos.filter((todo) => !todo.completed);
+
+        // Rebuild Map with only active todos
+        todoMap.clear();
+        activeTodos.forEach((todo) => todoMap.set(todo.id, todo));
+
+        todos = activeTodos;
+        render();
+        debugLog();
+    };
+
     // --- Render using Array.map() ---
     const render = () => {
         const filteredTodos = getFilteredTodos();
@@ -112,6 +149,8 @@ const TodoApp = (() => {
         createTodo,
         toggleTodo,
         deleteTodo,
+        setFilter,
+        clearCompleted,
         render,
         debugLog,
     };
@@ -124,6 +163,18 @@ document.getElementById("addBtn").addEventListener("click", () => {
 
 document.getElementById("todoInput").addEventListener("keydown", (e) => {
     if (e.key === "Enter") TodoApp.createTodo("general");
+});
+
+// --- Filter button event listeners ---
+document.querySelectorAll(".filterBtn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+        TodoApp.setFilter(btn.dataset.filter);
+    });
+});
+
+// --- Clear completed event listener ---
+document.getElementById("clearCompleted").addEventListener("click", () => {
+    TodoApp.clearCompleted();
 });
 
 // Initial render

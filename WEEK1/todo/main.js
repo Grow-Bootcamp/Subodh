@@ -11,6 +11,56 @@ const TodoApp = (() => {
     // Map — quick lookup of todo by ID
     const todoMap = new Map();
 
+    // --- localStorage key ---
+    const STORAGE_KEY = "todoAppData";
+
+    // --- Save to localStorage ---
+    const saveToLocalStorage = () => {
+        try {
+            const data = { todos, nextId };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch (e) {
+            console.error("Failed to save to localStorage:", e.message);
+        }
+    };
+
+    // --- Load from localStorage with try/catch error handling ---
+    const loadFromLocalStorage = () => {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return;
+
+            const data = JSON.parse(raw);
+
+            // Validate loaded data
+            if (!Array.isArray(data.todos)) {
+                throw new TypeError("Invalid todos data in localStorage");
+            }
+
+            todos = data.todos;
+            nextId = data.nextId || 1;
+
+            // Rebuild Map and Set from loaded data
+            todos.forEach((todo) => {
+                todoMap.set(todo.id, todo);
+                todo.tags.forEach((tag) => tagRegistry.add(tag));
+            });
+
+            console.log("Loaded from localStorage:", todos.length, "todos");
+        } catch (e) {
+            if (e instanceof SyntaxError) {
+                console.error("JSON parse error:", e.message);
+            } else if (e instanceof TypeError) {
+                console.error("Type error:", e.message);
+            } else {
+                console.error("Error loading from localStorage:", e.message);
+            }
+            // Reset corrupted data
+            todos = [];
+            nextId = 1;
+        }
+    };
+
     // DOM Elements
     const todoInput = document.getElementById("todoInput");
     const addBtn = document.getElementById("addBtn");
@@ -40,6 +90,7 @@ const TodoApp = (() => {
         tags.forEach((tag) => tagRegistry.add(tag));
 
         todoInput.value = "";
+        saveToLocalStorage(); // Persist after create
         render();
         debugLog();
     };
@@ -55,6 +106,7 @@ const TodoApp = (() => {
         const updated = todoMap.get(id);
         if (updated) updated.completed = !updated.completed;
 
+        saveToLocalStorage(); // Persist after toggle
         render();
         debugLog();
     };
@@ -65,6 +117,7 @@ const TodoApp = (() => {
         todos = todos.filter((todo) => todo.id !== id);
         todoMap.delete(id);
 
+        saveToLocalStorage(); // Persist after delete
         render();
         debugLog();
     };
@@ -102,6 +155,7 @@ const TodoApp = (() => {
         activeTodos.forEach((todo) => todoMap.set(todo.id, todo));
 
         todos = activeTodos;
+        saveToLocalStorage(); // Persist after clear completed
         render();
         debugLog();
     };
@@ -151,6 +205,7 @@ const TodoApp = (() => {
         deleteTodo,
         setFilter,
         clearCompleted,
+        loadFromLocalStorage,
         render,
         debugLog,
     };
@@ -177,5 +232,6 @@ document.getElementById("clearCompleted").addEventListener("click", () => {
     TodoApp.clearCompleted();
 });
 
-// Initial render
+// --- Load saved data and initial render ---
+TodoApp.loadFromLocalStorage();
 TodoApp.render();

@@ -157,22 +157,22 @@ Remove any layer and the layers above break.
 
 ### Layer 1 → Layer 2 → Layer 3,4,5 → Layer 6 → Layer 7,8,9,10 → Layer 11 → Layer 12 → Layer 13 → Layer 14
 
-| Layer | Name                | What It Does                          | Depends On      |
-|-------|---------------------|---------------------------------------|-----------------|
-| 1     | IIFE                | Creates private scope                 | Nothing         |
-| 2     | Private State       | todos, currentFilter, nextId          | Layer 1         |
-| 3     | Todo Object         | Data structure: id, text, completed   | Layer 2         |
-| 4     | Map                 | Fast O(1) lookup by todo ID           | Layer 2         |
-| 5     | localStorage        | Persists data across refreshes        | Layer 2         |
-| 6     | DOM References      | Cached HTML element references        | Layer 1         |
-| 7     | Create Todo         | Reads input, adds to array and map    | 2, 3, 4, 5, 6  |
-| 8     | Toggle Todo         | Flips completed status                | 2, 4, 5, 6     |
-| 9     | Delete Todo         | Removes from array and map            | 2, 4, 5, 6     |
-| 10    | Filter              | Filters todos by status               | 2, 6            |
-| 11    | Render              | Converts data to HTML                 | 6, 10, 12       |
-| 12    | Update Count        | Counts active todos with reduce       | 2, 6            |
-| 13    | Event Listeners     | Connects UI clicks to methods         | 1               |
-| 14    | Initialization      | Loads data and renders on startup     | 5, 11           |
+| Layer | Name               | What It Does                         | Depends On     |
+|-------|--------------------|--------------------------------------|----------------|
+| 1     | IIFE               | Creates private scope                | Nothing        |
+| 2     | Private State      | todos, currentFilter, nextId         | Layer 1        |
+| 3     | Todo Object        | Data structure: id, text, completed  | Layer 2        |
+| 4     | Map                | Fast O(1) lookup by todo ID          | Layer 2        |
+| 5     | localStorage       | Persists data across refreshes       | Layer 2        |
+| 6     | DOM References     | Cached HTML element references       | Layer 1        |
+| 7     | Create Todo        | Reads input, adds to array and map   | 2, 3, 4, 5, 6 |
+| 8     | Toggle Todo        | Flips completed status               | 2, 4, 5, 6    |
+| 9     | Delete Todo        | Removes from array and map           | 2, 4, 5, 6    |
+| 10    | Filter             | Filters todos by status              | 2, 6           |
+| 11    | Render             | Converts data to HTML                | 6, 10, 12      |
+| 12    | Update Count       | Counts active todos with reduce      | 2, 6           |
+| 13    | Event Listeners    | Connects UI clicks to methods        | 1              |
+| 14    | Initialization     | Loads data and renders on startup    | 5, 11          |
 
 ### Visual Flow
 

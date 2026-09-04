@@ -165,9 +165,9 @@ Remove any layer and the layers above break.
 | 4     | Map                | Fast O(1) lookup by todo ID          | Layer 2        |
 | 5     | localStorage       | Persists data across refreshes       | Layer 2        |
 | 6     | DOM References     | Cached HTML element references       | Layer 1        |
-| 7     | Create Todo        | Reads input, adds to array and map   | 2, 3, 4, 5, 6 |
-| 8     | Toggle Todo        | Flips completed status               | 2, 4, 5, 6    |
-| 9     | Delete Todo        | Removes from array and map           | 2, 4, 5, 6    |
+| 7     | Create Todo        | Reads input, adds to array and map   | 2, 3, 4, 5, 6  |
+| 8     | Toggle Todo        | Flips completed status               | 2, 4, 5, 6     |
+| 9     | Delete Todo        | Removes from array and map           | 2, 4, 5, 6     |
 | 10    | Filter             | Filters todos by status              | 2, 6           |
 | 11    | Render             | Converts data to HTML                | 6, 10, 12      |
 | 12    | Update Count       | Counts active todos with reduce      | 2, 6           |

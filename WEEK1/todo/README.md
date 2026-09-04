@@ -46,7 +46,6 @@ WEEK1/todo/
 | Array.map()        | Line 95, 162    | Transform todos into HTML strings     |
 | Array.filter()     | Line 111, 122   | Remove or filter todos by condition   |
 | Array.reduce()     | Line 180        | Count active todos                    |
-| Map                | Line 9, 84      | Fast O(1) lookup by todo ID           |
 | localStorage       | Line 18, 27     | Persist data across page refreshes    |
 | try/catch          | Line 16-21      | Handle storage errors gracefully      |
 | JSON.stringify     | Line 18         | Convert objects to storage strings    |
@@ -155,24 +154,23 @@ Only active todos shown on screen
 Each layer builds on the one below it.
 Remove any layer and the layers above break.
 
-### Layer 1 → Layer 2 → Layer 3,4,5 → Layer 6 → Layer 7,8,9,10 → Layer 11 → Layer 12 → Layer 13 → Layer 14
+### Layer 1 → Layer 2 → Layer 3,4 → Layer 5 → Layer 6,7,8,9 → Layer 10 → Layer 11 → Layer 12 → Layer 13
 
-| Layer | Name               | What It Does                         | Depends On     |
-|-------|--------------------|--------------------------------------|----------------|
-| 1     | IIFE               | Creates private scope                | Nothing        |
-| 2     | Private State      | todos, currentFilter, nextId         | Layer 1        |
-| 3     | Todo Object        | Data structure: id, text, completed  | Layer 2        |
-| 4     | Map                | Fast O(1) lookup by todo ID          | Layer 2        |
-| 5     | localStorage       | Persists data across refreshes       | Layer 2        |
-| 6     | DOM References     | Cached HTML element references       | Layer 1        |
-| 7     | Create Todo        | Reads input, adds to array and map   | 2, 3, 4, 5, 6  |
-| 8     | Toggle Todo        | Flips completed status               | 2, 4, 5, 6     |
-| 9     | Delete Todo        | Removes from array and map           | 2, 4, 5, 6     |
-| 10    | Filter             | Filters todos by status              | 2, 6           |
-| 11    | Render             | Converts data to HTML                | 6, 10, 12      |
-| 12    | Update Count       | Counts active todos with reduce      | 2, 6           |
-| 13    | Event Listeners    | Connects UI clicks to methods        | 1              |
-| 14    | Initialization     | Loads data and renders on startup    | 5, 11          |
+| Layer | Name                | What It Does                          | Depends On      |
+|-------|---------------------|---------------------------------------|-----------------|
+| 1     | IIFE                | Creates private scope                 | Nothing         |
+| 2     | Private State       | todos, currentFilter, nextId          | Layer 1         |
+| 3     | Todo Object         | Data structure: id, text, completed   | Layer 2         |
+| 4     | localStorage        | Persists data across refreshes        | Layer 2         |
+| 5     | DOM References      | Cached HTML element references        | Layer 1         |
+| 6     | Create Todo         | Reads input, adds to array            | 2, 3, 4, 5      |
+| 7     | Toggle Todo         | Flips completed status                | 2, 4, 5         |
+| 8     | Delete Todo         | Removes from array                    | 2, 4, 5         |
+| 9     | Filter              | Filters todos by status               | 2, 5            |
+| 10    | Render              | Converts data to HTML                 | 5, 9, 11        |
+| 11    | Update Count        | Counts active todos with reduce       | 2, 5            |
+| 12    | Event Listeners     | Connects UI clicks to methods         | 1               |
+| 13    | Initialization      | Loads data and renders on startup     | 4, 10           |
 
 ### Visual Flow
 
@@ -182,22 +180,23 @@ Layer 1: IIFE
 Layer 2: Private State
     │
     ├──→ Layer 3: Todo Object
-    ├──→ Layer 4: Map
-    └──→ Layer 5: localStorage
+    └──→ Layer 4: localStorage
               │
-Layer 6: DOM References
+Layer 5: DOM References
     │
-    ├──→ Layer 7:  Create Todo
-    ├──→ Layer 8:  Toggle Todo
-    ├──→ Layer 9:  Delete Todo
-    └──→ Layer 10: Filter
+    ├──→ Layer 6:  Create Todo
+    ├──→ Layer 7:  Toggle Todo
+    ├──→ Layer 8:  Delete Todo
+    └──→ Layer 9:  Filter
               │
-Layer 11: Render
+Layer 10: Render
     │
-Layer 12: Update Count
+Layer 11: Update Count
     │
-Layer 13: Event Listeners
+Layer 12: Event Listeners
     │
+Layer 13: Initialization
+```
 Layer 14: Initialization
 ```
 

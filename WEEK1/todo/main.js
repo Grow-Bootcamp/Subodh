@@ -5,9 +5,6 @@ const TodoApp = (() => {
     let currentFilter = "all";
     let nextId = 1;
 
-    // Map — quick lookup of todo by ID
-    const todoMap = new Map();
-
     // --- localStorage key ---
     const STORAGE_KEY = "todoAppData";
 
@@ -36,11 +33,6 @@ const TodoApp = (() => {
 
             todos = data.todos;
             nextId = data.nextId || 1;
-
-            // Rebuild Map from loaded data
-            todos.forEach((todo) => {
-                todoMap.set(todo.id, todo);
-            });
 
             console.log("Loaded from localStorage:", todos.length, "todos");
         } catch (e) {
@@ -80,9 +72,6 @@ const TodoApp = (() => {
         // Spread — add new todo without mutating original array
         todos = [...todos, todo];
 
-        // Update Map
-        todoMap.set(todo.id, todo);
-
         todoInput.value = "";
         saveToLocalStorage();
         render();
@@ -96,10 +85,6 @@ const TodoApp = (() => {
             todo.id === id ? { ...todo, completed: !todo.completed } : todo
         );
 
-        // Update Map
-        const updated = todoMap.get(id);
-        if (updated) updated.completed = !updated.completed;
-
         saveToLocalStorage(); // Persist after toggle
         render();
         debugLog();
@@ -109,7 +94,6 @@ const TodoApp = (() => {
     const deleteTodo = (id) => {
         // Spread + filter — immutable removal
         todos = todos.filter((todo) => todo.id !== id);
-        todoMap.delete(id);
 
         saveToLocalStorage(); // Persist after delete
         render();
@@ -142,13 +126,8 @@ const TodoApp = (() => {
     // --- Clear completed todos ---
     const clearCompleted = () => {
         // Keep only active todos
-        const activeTodos = todos.filter((todo) => !todo.completed);
+        todos = todos.filter((todo) => !todo.completed);
 
-        // Rebuild Map with only active todos
-        todoMap.clear();
-        activeTodos.forEach((todo) => todoMap.set(todo.id, todo));
-
-        todos = activeTodos;
         saveToLocalStorage(); // Persist after clear completed
         render();
         debugLog();
@@ -187,7 +166,6 @@ const TodoApp = (() => {
     // --- console.table() for debugging ---
     const debugLog = () => {
         console.table(todos);
-        console.log("Todo Map size:", todoMap.size);
     };
 
     // Public API — returned from IIFE

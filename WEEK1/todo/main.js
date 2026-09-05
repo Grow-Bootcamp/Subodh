@@ -51,7 +51,6 @@ const TodoApp = (() => {
 
   // DOM Elements
   const todoInput = document.getElementById("todoInput");
-  const addBtn = document.getElementById("addBtn");
   const todoList = document.getElementById("todoList");
   const todoCount = document.getElementById("todoCount");
   const filterBtns = document.querySelectorAll(".filterBtn");

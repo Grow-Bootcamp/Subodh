@@ -1,11 +1,101 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Grow Bootcamp -- Week2 Day1</title>
-</head>
-<body>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div id="header">Header (id="header")</div>
+
+    <button class="btn">Button with class "btn"</button>
+    <button class="btn">Another .btn</button>
+    <br /><br />
+
+    <div class="item">Item 1 (class "item")</div>
+    <div class="item">Item 2 (class "item")</div>
+    <div class="item">Item 3 (class "item")</div>
+
+    <div id="container">
+      <p>
+        Container (#container) – new elements will be appended/prepended here.
+      </p>
+    </div>
+
+    <div class="target">I am the .target element – will be modified.</div>
+    <button class="remove-me">
+      I will be removed (class "remove-me") -- Click Me.
+    </button>
+
+    <ul id="list">
+      <li>List item 1</li>
+      <li>List item 2</li>
+      <li>List item 3</li>
+    </ul>
+
+    <button id="myButton">Click me (id="myButton")</button>
+
+    <hr />
+    <h3>Check the console for logged messages.</h3>
+
+    <script>
+    //DOM Manipulation
+      const header = document.getElementById("header");
+      console.log("Header element:", header);
+
+      const button = document.querySelector(".btn");
+      console.log("First .btn:", button);
+      const allButtons = document.querySelectorAll("button");
+      console.log("All buttons:", allButtons);
+
+      const items = document.getElementsByClassName("item");
+      console.log('Items with class "item":', items);
+
+      const newDiv = document.createElement("div");
+      newDiv.textContent = "Hello, world!";
+      newDiv.classList.add("highlight");
+      document.body.appendChild(newDiv);
+
+      const container = document.querySelector("#container");
+      container.append(newDiv);
+
+      const prependDiv = document.createElement("div");
+      prependDiv.textContent = "I was prepended!";
+      prependDiv.style.background = "#abe86f";
+      container.prepend(prependDiv);
+
+      const el = document.querySelector(".target");
+      if (el) {
+        el.textContent = "New text (modified)";
+        el.style.color = "blue";
+        el.classList.add("active");
+        el.setAttribute("data-id", "123");
+      }
+
+      const removeEl = document.querySelector(".remove-me");
+      if (removeEl) {
+        removeEl.addEventListener("click", () => {
+          removeEl.remove();
+        });
+      }
+
+      const btn = document.querySelector("#myButton");
+      btn.addEventListener("click", (event) => {
+        console.log("Button clicked!");
+        event.preventDefault();
+        alert("Button clicked! See console.");
+      });
+
+      document.querySelector("#list").addEventListener("click", (event) => {
+        if (event.target.matches("li")) {
+          console.log("List item clicked:", event.target.textContent);
+          alert(`You clicked: ${event.target.textContent}`);
+        }
+      });
+
+      console.log("DOM manipulation complete.");
+    </script>
     <script src="./main.js"></script>
-</body>
+  </body>
 </html>

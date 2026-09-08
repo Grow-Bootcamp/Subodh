@@ -39,6 +39,18 @@
     <hr />
     <h3>Check the console for logged messages.</h3>
 
+   <h2>Simple HTTP Test</h2>
+
+  <!-- Buttons -->
+  <button onclick="runGet()">GET</button>
+  <button onclick="runPost()">POST</button>
+  <button onclick="runPut()">PUT</button>
+  <button onclick="runDelete()">DELETE</button>
+
+  <!-- Displays Status and Result -->
+  <h3 id="status">Click a button</h3>
+  <pre id="output"></pre>
+
     <script>
     //DOM Manipulation
       const header = document.getElementById("header");

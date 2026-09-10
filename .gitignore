@@ -1,2 +1,4 @@
 dailyReports/
 weeklyReports/
+/node_modules/
+.vscode

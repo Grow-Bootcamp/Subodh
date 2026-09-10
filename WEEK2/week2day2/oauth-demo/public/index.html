@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Google Login Demo</title>
+  </head>
+
+  <body>
+    <h1>My Website</h1>
+
+    <div id="app">Checking login...</div>
+
+    <script>
+      // Check login when page loads
+      checkLogin();
+
+      //Check if the user is Logged in
+      async function checkLogin() {
+        const response = await fetch("/me");
+
+        const data = await response.json();
+
+        if (data.loggedIn) {
+          showUser(data.user);
+        } else {
+          showLogin();
+        }
+      }
+
+      // Show logged-in user
+      function showUser(user) {
+        document.getElementById("app").innerHTML = `
+
+        <h2>Hello ${user.name}!</h2>
+
+        <p>Email: ${user.email}</p>
+
+        <img
+          src="${user.picture}"
+          width="100"
+          height="100"
+          alt="Profile Picture"
+          referrerpolicy="no-referrer"
+        >
+
+      `;
+      }
+
+      //Show Login button
+      function showLogin() {
+        document.getElementById("app").innerHTML = `
+
+        <p>You are not logged in.</p>
+
+        <button onclick="login()">
+          Login with Google
+        </button>
+
+      `;
+      }
+
+      //Login Button
+      function login() {
+        // Send user to our backend
+        // The backend will send them to Google
+        window.location.href = "/login";
+      }
+    </script>
+  </body>
+</html>

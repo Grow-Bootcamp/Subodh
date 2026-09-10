@@ -1,6 +1,6 @@
 # Week 2 Day 2
 
-Demos covering Docker containerization, Google OAuth, and TypeScript fundamentals.
+Demos covering Docker containerization, Docker Compose multi-container orchestration, Google OAuth, TypeScript fundamentals, and caching/memoization patterns.
 
 ## Projects
 
@@ -17,6 +17,24 @@ Topics:
 - Express.js `express.json()` middleware for parsing JSON bodies
 - Listening on `0.0.0.0` to expose server outside the container
 - Frontend served inline via `res.send()` with HTML/JS
+
+### docker-compose-demo
+
+Multi-container application orchestrated with Docker Compose, consisting of a PostgreSQL database, an Express.js API, and a React client. Demonstrates how Docker Compose manages service dependencies, networking, and persistent storage.
+
+Topics:
+
+- `docker-compose.yml` structure: `services`, `image`, `build`, `ports`, `volumes`, `environment`, `depends_on`, `healthcheck`
+- Defining multiple services: `postgres`, `api`, `client`
+- PostgreSQL 16 Alpine image with user/password/database environment variables
+- Named volumes (`pgdata`) for persistent database storage across container restarts
+- Health checks: `pg_isready` to verify the database is accepting connections before dependent services start
+- `depends_on` with `condition: service_healthy` to enforce startup order
+- Multi-stage Docker builds for the client: builder stage (Node + Vite build) → production stage (nginx serving static files)
+- `nginxinc/nginx-unprivileged:alpine-slim` for serving built React assets on port 8080
+- Express.js API using `pg.Pool` with `DATABASE_URL` connection string
+- Inter-service communication via Docker's internal DNS (e.g., `postgres:5432` from within the API container)
+- Running the full stack with `docker compose up`
 
 ### oauth-demo
 
@@ -123,3 +141,18 @@ TypeScript project demonstrating core language features including types, interfa
 - Side-effect imports: `import "./types"` just importing runs the file (no named exports used)
 - Module resolution: TypeScript finds files relative to `src/`
 - Real world: Large apps are split into modules (auth, dashboard, settings). Each module has its own types, functions, and logic. The entry point wires them all together.
+
+### caching
+
+JavaScript memoization demo that caches function results to avoid redundant expensive computations. Uses a higher-order function to wrap any function with caching behavior.
+
+Topics:
+
+- Memoization: storing the results of expensive function calls and returning the cached result when the same inputs occur again
+- Higher-order function pattern: `memoization(fn)` returns a new function that wraps the original with caching logic
+- `Map` as an in-memory cache store for key-value pairs
+- Cache key generation via `JSON.stringify(args)` to serialize function arguments into a unique string key
+- Cache hit: when the key exists in the cache, return the stored result without re-running the function
+- Cache miss: when the key is absent, execute the original function, store the result in the cache, then return it
+- Performance measurement with `console.time` / `console.timeEnd` to compare execution time between cache hits and misses
+- Practical use: API response caching, database query results, expensive DOM computations, recursive algorithm optimization (e.g., Fibonacci)

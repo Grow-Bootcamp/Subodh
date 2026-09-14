@@ -165,19 +165,44 @@ const TodoApp = (() => {
 
     todoList.innerHTML = filteredTodos
       .map(
-        (todo) => `
-            <li class="todoItem ${todo.completed ? "completed" : ""}">
-                <input type="checkbox" class="todoCheckbox"
-                    ${todo.completed ? "checked" : ""}
-                    onchange="TodoApp.toggleTodo(${todo.id})">
-                <span class="todoText">${todo.text}</span>
-                <button class="deleteBtn" onclick="TodoApp.deleteTodo(${todo.id})">Delete</button>
-            </li>
-        `,
+        (todo) => {
+          if (todo.id === editingId) {
+            return `
+                <li class="todoItem editing">
+                    <input type="checkbox" class="todoCheckbox"
+                        ${todo.completed ? "checked" : ""}
+                        onchange="TodoApp.toggleTodo(${todo.id})">
+                    <input type="text" class="editInput" value="${todo.text}"
+                        onblur="TodoApp.editTodo(${todo.id}, this.value)"
+                        onkeydown="if(event.key==='Enter') TodoApp.editTodo(${todo.id}, this.value); if(event.key==='Escape') TodoApp.cancelEdit();">
+                    <button class="deleteBtn" onclick="TodoApp.deleteTodo(${todo.id})">Delete</button>
+                </li>
+            `;
+          }
+          return `
+                <li class="todoItem ${todo.completed ? "completed" : ""}">
+                    <input type="checkbox" class="todoCheckbox"
+                        ${todo.completed ? "checked" : ""}
+                        onchange="TodoApp.toggleTodo(${todo.id})">
+                    <span class="todoText">${todo.text}</span>
+                    <button class="editBtn" onclick="TodoApp.startEdit(${todo.id})">Edit</button>
+                    <button class="deleteBtn" onclick="TodoApp.deleteTodo(${todo.id})">Delete</button>
+                </li>
+          `;
+        },
       )
       .join("");
 
     updateCount();
+
+    // Autofocus the edit input if in edit mode
+    if (editingId !== null) {
+      const editInput = todoList.querySelector(".editInput");
+      if (editInput) {
+        editInput.focus();
+        editInput.select();
+      }
+    }
   };
 
   // --- Array.reduce() — count active todos ---

@@ -1,35 +1,40 @@
 import express from "express";
-import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
+import { connectToDatabase } from "./db.js";
 
 dotenv.config();
 
-const app = express();
-const port = process.env.PORT || 3000;
-const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/practice";
-const dbName = process.env.MONGODB_DB || "sample_mflix";
+const app: express.Application = express();
+const port: number = parseInt(process.env.PORT || "3000");
 
 app.use(express.json());
+//Middleware to parse JSON bodies
 
-const client = new MongoClient(uri);
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") return res.sendStatus(204);
+  next();
+});
 
-async function startServer() {
+app.get("/movies", async (req: express.Request, res: express.Response) => {
   try {
-    await client.connect();
-    const db = client.db(dbName);
-    console.log(`Connected to MongoDB — database: ${db.databaseName}`);
-
-    app.get("/", (_req, res) => {
-      res.json({ message: "MongoDB + Express + TypeScript is running" });
-    });
-
-    app.listen(port, () => {
-      console.log(`Server running on http://localhost:${port}`);
-    });
+    const movie = await connectToDatabase();
+    if (!movie) {
+      return res.status(404).json({ error: "Movie not found" });
+    }
+    res.json(movie).status(200);
   } catch (error) {
-    console.error("Failed to connect to MongoDB:", error);
-    process.exit(1);
+    console.error("Error fetching movie:", error);
+    res.status(500).json({ error: "Failed to fetch movie" });
   }
-}
+});
 
-startServer();
+app.get("/", (req: express.Request, res: express.Response) => {
+  res.send("Hello, World!");
+});
+
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});

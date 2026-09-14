@@ -154,6 +154,31 @@ body {
     background-color: #e74c3c;
 }
 
+.editBtn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.85rem;
+    color: #4a90d9;
+    background: none;
+    border: 1px solid #4a90d9;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.editBtn:hover {
+    color: #fff;
+    background-color: #4a90d9;
+}
+
+.editInput {
+    flex: 1;
+    padding: 0.25rem 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #4a90d9;
+    border-radius: 4px;
+    outline: none;
+}
+
 /* Footer Section */
 .footerSection {
     display: flex;

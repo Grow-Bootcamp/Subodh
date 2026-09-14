@@ -3,6 +3,7 @@ const TodoApp = (() => {
   // Closure — private state, inaccessible from outside
   let todos = [];
   let currentFilter = "all";
+  let editingId = null;
   let nextId = 1;
 
   // --- localStorage key ---
@@ -98,6 +99,33 @@ const TodoApp = (() => {
     debugLog();
   };
 
+  // --- Edit: enter edit mode ---
+  const startEdit = (id) => {
+    editingId = id;
+    render();
+  };
+
+  // --- Edit: cancel editing ---
+  const cancelEdit = () => {
+    editingId = null;
+    render();
+  };
+
+  // --- Edit: save edited text ---
+  const editTodo = (id, newText) => {
+    const text = newText.trim();
+    if (!text) return cancelEdit();
+
+    todos = todos.map((todo) =>
+      todo.id === id ? { ...todo, text } : todo
+    );
+
+    editingId = null;
+    saveToLocalStorage();
+    render();
+    debugLog();
+  };
+
   // --- Array.filter() — filter todos by status ---
   const getFilteredTodos = () => {
     if (currentFilter === "active") {
@@ -137,19 +165,44 @@ const TodoApp = (() => {
 
     todoList.innerHTML = filteredTodos
       .map(
-        (todo) => `
-            <li class="todoItem ${todo.completed ? "completed" : ""}">
-                <input type="checkbox" class="todoCheckbox"
-                    ${todo.completed ? "checked" : ""}
-                    onchange="TodoApp.toggleTodo(${todo.id})">
-                <span class="todoText">${todo.text}</span>
-                <button class="deleteBtn" onclick="TodoApp.deleteTodo(${todo.id})">Delete</button>
-            </li>
-        `,
+        (todo) => {
+          if (todo.id === editingId) {
+            return `
+                <li class="todoItem editing">
+                    <input type="checkbox" class="todoCheckbox"
+                        ${todo.completed ? "checked" : ""}
+                        onchange="TodoApp.toggleTodo(${todo.id})">
+                    <input type="text" class="editInput" value="${todo.text}"
+                        onblur="TodoApp.editTodo(${todo.id}, this.value)"
+                        onkeydown="if(event.key==='Enter') TodoApp.editTodo(${todo.id}, this.value); if(event.key==='Escape') TodoApp.cancelEdit();">
+                    <button class="deleteBtn" onclick="TodoApp.deleteTodo(${todo.id})">Delete</button>
+                </li>
+            `;
+          }
+          return `
+                <li class="todoItem ${todo.completed ? "completed" : ""}">
+                    <input type="checkbox" class="todoCheckbox"
+                        ${todo.completed ? "checked" : ""}
+                        onchange="TodoApp.toggleTodo(${todo.id})">
+                    <span class="todoText">${todo.text}</span>
+                    <button class="editBtn" onclick="TodoApp.startEdit(${todo.id})">Edit</button>
+                    <button class="deleteBtn" onclick="TodoApp.deleteTodo(${todo.id})">Delete</button>
+                </li>
+          `;
+        },
       )
       .join("");
 
     updateCount();
+
+    // Autofocus the edit input if in edit mode
+    if (editingId !== null) {
+      const editInput = todoList.querySelector(".editInput");
+      if (editInput) {
+        editInput.focus();
+        editInput.select();
+      }
+    }
   };
 
   // --- Array.reduce() — count active todos ---
@@ -171,6 +224,9 @@ const TodoApp = (() => {
     createTodo,
     toggleTodo,
     deleteTodo,
+    startEdit,
+    cancelEdit,
+    editTodo,
     setFilter,
     clearCompleted,
     loadFromLocalStorage,

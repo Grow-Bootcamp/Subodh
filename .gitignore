@@ -2,6 +2,9 @@
 dailyReports/
 weeklyReports/
 
+# Tools
+tools/
+
 # Dependencies
 node_modules/
 

@@ -1,0 +1,9 @@
+{
+  "name": "growbootcamp",
+  "version": "1.0.0",
+  "description": "Week 3 Day 3 — Node.js Internals Tasks",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  }
+}

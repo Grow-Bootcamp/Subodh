@@ -1,6 +1,7 @@
 {
   "name": "growbootcamp",
   "version": "1.0.0",
+  "type": "commonjs",
   "description": "Week 3 Day 4 — Event Loop, Events & Basic Routing",
   "main": "app.js",
   "scripts": {

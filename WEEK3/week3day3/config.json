@@ -1,0 +1,11 @@
+{
+  "appName": "GrowBootcamp",
+  "version": "1.0.0",
+  "environment": "development",
+  "port": 3000,
+  "features": {
+    "logging": true,
+    "auth": true,
+    "rateLimit": false
+  }
+}

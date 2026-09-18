@@ -1,22 +1,22 @@
 {
-  "name": "middleware",
-  "private": true,
-  "version": "0.0.0",
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
   "type": "module",
+  "main": "index.js",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "dev": "nodemon --exec tsx src/server.ts"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^26.6.1",
     "nodemon": "^3.1.14",
-    "ts-node": "^10.9.2",
-    "typescript": "~6.0.2",
-    "vite": "^8.3.0"
-  },
-  "dependencies": {
-    "express": "^5.2.1"
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2"
   }
 }

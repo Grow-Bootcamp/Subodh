@@ -4,10 +4,19 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "esModuleInterop": true,
-    "strict": true,
+    "strict": false,
     "skipLibCheck": true,
     "outDir": "./dist",
-    "rootDir": "./"
+    "rootDir": "./",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
-  "include": ["server.ts", "models", "repos", "controllers", "routes"]
+  "include": [
+    "server.ts",
+    "models",
+    "repos",
+    "controllers",
+    "routes",
+    "data-source.ts"
+  ]
 }

@@ -1,6 +1,9 @@
+import "reflect-metadata";
 import dotenv from "dotenv";
 import express from "express";
-import mongoose from "mongoose";
+// import mongoose from "mongoose";
+// import prisma from "./lib/prisma.js";
+import { AppDataSource } from "./data-source.js";
 import userRoute from "./routes/userRoute.js";
 
 dotenv.config();
@@ -21,14 +24,33 @@ app.use(express.json());
 
 app.use("/api/", userRoute); // Just 'create fn' in the controller for POST req for now
 
+// const startServer = async () => {
+//   const conn = await mongoose.connect(process.env.MONGODB_URI ?? "");
+//   // Wait for DB connection to complete
+//   if (conn) {
+//     app.listen(port, () => {
+//       console.log(`[SERVER] Running on http://localhost:${port}`);
+//     });
+//   }
+// };
+
+// startServer();
+
+// const startServer = async () => {
+//   await prisma.$connect();
+//   app.listen(port, () => {
+//     console.log(`[SERVER] Running on http://localhost:${port}`);
+//   });
+// };
+
+// startServer();
+
 const startServer = async () => {
-  const conn = await mongoose.connect(process.env.MONGODB_URI ?? "");
-  // Wait for DB connection to complete
-  if (conn) {
-    app.listen(port, () => {
-      console.log(`[SERVER] Running on http://localhost:${port}`);
-    });
-  }
+  await AppDataSource.initialize();
+  console.log("[DB] MySQL connected via TypeORM");
+  app.listen(port, () => {
+    console.log(`[SERVER] Running on http://localhost:${port}`);
+  });
 };
 
 startServer();

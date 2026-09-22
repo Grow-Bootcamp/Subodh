@@ -1,59 +1,127 @@
+// import { Request, Response } from "express";
+// import { userRepo } from "../repos/userRepo.js";
+
+// const createMultipleUsers = async (req: Request, res: Response) => {
+//   try {
+//     const sampleUsers: Record<string, unknown>[] = [
+//       {
+//         name: "Alex Morgan",
+//         age: 28,
+//         contact: 15550192834,
+//         address: "123 Maple Street, Springfield, IL",
+//         gender: "Female",
+//       },
+//       {
+//         name: "Jordan Lee",
+//         age: 34,
+//         contact: 15550148291,
+//         address: "456 Oak Avenue, Austin, TX",
+//         gender: "Non-binary",
+//       },
+//       {
+//         name: "Marcus Chen",
+//         age: 22,
+//         contact: 15550173640,
+//         address: "789 Pine Road, Seattle, WA",
+//         gender: "Male",
+//       },
+//       {
+//         name: "Sophia Rodriguez",
+//         age: 41,
+//         contact: 15550129481,
+//         address: "321 Cedar Lane, Miami, FL",
+//         gender: "Female",
+//       },
+//       {
+//         name: "David Kim",
+//         age: 29,
+//         contact: 15550165920,
+//         address: "654 Elm Boulevard, Chicago, IL",
+//         gender: "Male",
+//       },
+//     ];
+//     const user = await userRepo.createManyUsers(sampleUsers);
+//     if (!user) {
+//       res.status(400).json({ success: false, message: "Send valid data" });
+//       return;
+//     }
+//     res.status(201).json({ success: true, user });
+//   } catch (err: any) {
+//     console.log(err.message);
+//     res.status(500).json({ success: false, message: err.message });
+//   }
+// };
+
+// const findUser = async (req: Request, res: Response) => {
+//   res.status(501).json({ message: "Not implemented" });
+// };
+
+// export { createMultipleUsers, findUser };
+
 import { Request, Response } from "express";
 import { userRepo } from "../repos/userRepo.js";
 
 const createMultipleUsers = async (req: Request, res: Response) => {
   try {
-    const sampleUsers: Record<string, unknown>[] = [
+    // This should come from request url or body
+    const sampleUsers = [
       {
         name: "Alex Morgan",
         age: 28,
-        contact: 15550192834,
+        contact: "15550192834",
         address: "123 Maple Street, Springfield, IL",
         gender: "Female",
       },
       {
         name: "Jordan Lee",
         age: 34,
-        contact: 15550148291,
+        contact: "15550148291",
         address: "456 Oak Avenue, Austin, TX",
         gender: "Non-binary",
       },
       {
         name: "Marcus Chen",
         age: 22,
-        contact: 15550173640,
+        contact: "15550173640",
         address: "789 Pine Road, Seattle, WA",
         gender: "Male",
       },
       {
         name: "Sophia Rodriguez",
         age: 41,
-        contact: 15550129481,
+        contact: "15550129481",
         address: "321 Cedar Lane, Miami, FL",
         gender: "Female",
       },
       {
         name: "David Kim",
         age: 29,
-        contact: 15550165920,
+        contact: "15550165920",
         address: "654 Elm Boulevard, Chicago, IL",
         gender: "Male",
       },
     ];
-    const user = await userRepo.createManyUsers(sampleUsers);
-    if (!user) {
-      res.status(400).json({ success: false, message: "Send valid data" });
-      return;
-    }
-    res.status(201).json({ success: true, user });
+    const result = await userRepo.createManyUsers(sampleUsers);
+    res.status(201).json({ success: true, count: result.length });
   } catch (err: any) {
     console.log(err.message);
     res.status(500).json({ success: false, message: err.message });
   }
 };
 
-const findUser = async (req: Request, res: Response) => {
+const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    // Paramaters should come from request url or body
+    const response = await userRepo.getAllUsers(0, 10);
+    if (!response) throw new Error("[Database]: Users not found");
+    res.status(200).json({ success: true, data: response });
+  } catch (error: any) {
+    console.log(`[Database]: ${error.message}`);
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+const getUser = async (req: Request, res: Response) => {
   res.status(501).json({ message: "Not implemented" });
 };
 
-export { createMultipleUsers, findUser };
+export { createMultipleUsers, getAllUsers, getUser };

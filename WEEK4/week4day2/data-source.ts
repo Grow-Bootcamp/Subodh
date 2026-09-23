@@ -18,4 +18,10 @@ export const AppSource = new DataSource({
   //synchronize is bad practice in real world app as it will alter db automatically if anything changes in the models/schema. Use Migration instead.
 });
 
-await AppSource.initialize();
+// TypeORM CLI (cli.js) calls initialize() itself — skip auto-init to avoid double-connect
+const isTypeOrmCli = process.argv.some(
+  (arg) => arg.includes("typeORM") || arg.includes("typeorm") || arg.includes("cli.js"),
+);
+if (!isTypeOrmCli) {
+  await AppSource.initialize();
+}

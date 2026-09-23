@@ -8,16 +8,16 @@ export const listAccounts = async (req: Request, res: Response) => {
   try {
     const accounts = await accountRepo.find({
       where: { ownerId: req.user!.sub },
-      select: [
-        "id",
-        "accountNumber",
-        "accountType",
-        "currency",
-        "balance",
-        "pendingBalance",
-        "status",
-        "createdAt",
-      ],
+      select: {
+        id: true,
+        accountNumber: true,
+        accountType: true,
+        currency: true,
+        balance: true,
+        pendingBalance: true,
+        status: true,
+        createdAt: true,
+      },
     });
     return res.status(200).json({
       success: true,

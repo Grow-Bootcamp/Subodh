@@ -17,7 +17,7 @@
 //     this.accountRepo = new AccountRepo();
 //   }
 
-//   executeTranfser = async (
+//   executeTransfer = async (
 //     fromAccountId: string,
 //     toAccountId: string,
 //     amountInCents: bigint,
@@ -67,7 +67,7 @@ export interface TransferResult {
 export class TransferService {
   private accountRepo = new AccountRepo();
 
-  executeTranfser = async (
+  executeTransfer = async (
     fromAccountId: string,
     toAccountId: string,
     amountInCents: bigint,
@@ -101,7 +101,7 @@ export class TransferService {
       };
     });
   };
-};
+}
 //     } catch (error) {
 //       await session.abortTransaction();
 //       throw error;

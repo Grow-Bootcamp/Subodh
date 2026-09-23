@@ -110,7 +110,7 @@ export const handleTransfer = async (req: Request, res: Response) => {
       });
     }
 
-    const result = await transferService.executeTranfser(
+    const result = await transferService.executeTransfer(
       fromAccountId,
       toAccountId,
       parsedAmount,

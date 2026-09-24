@@ -1,0 +1,32 @@
+{
+  "name": "support-sla-learning",
+  "version": "0.1.0",
+  "description": "Learning scaffold: Support Ticket SLA Reminder System (MongoDB, Mongoose, populate(), CRON, Express, TypeScript)",
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
+  },
+  "keywords": [
+    "learning",
+    "mongoose",
+    "cron",
+    "express",
+    "typescript"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^18.0.3",
+    "express": "^5.2.1",
+    "mongoose": "^9.10.2",
+    "node-cron": "^4.6.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.2",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

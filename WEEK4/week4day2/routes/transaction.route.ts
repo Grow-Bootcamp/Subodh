@@ -7,7 +7,7 @@
 // export default router;
 
 import { Router } from "express";
-import { handleTransfer } from "../controllers/transaction.contoller.js";
+import { handleTransfer } from "../controllers/transaction.controller.js";
 import { requireAuth } from "../middleware/auth.middleware.js";
 
 const router = Router();

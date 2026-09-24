@@ -1,5 +1,7 @@
+import "reflect-metadata"; // Required for TypeORM decorators — keep this first
 import "dotenv/config";
 import express from "express";
+import { AppSource } from "./config/db.js";
 
 // ==========================================
 // EXPRESS APPLICATION SHELL
@@ -13,14 +15,14 @@ import express from "express";
 // Before starting the server, think about the startup order:
 //
 // 1. Load environment variables          <- done (dotenv/config above)
-// 2. Connect to MongoDB                  <- YOUR TASK (see src/config/db.ts)
+// 2. Connect to PostgreSQL (DataSource)  <- YOUR TASK (see src/config/db.ts)
 // 3. Start any background jobs (CRON)    <- YOUR TASK (see src/jobs/slaReminder.job.ts)
 // 4. Start Express                       <- below
 //
 // Decide how you want to structure this yourself.
 //
 // Questions:
-// - What happens if Express starts before MongoDB is connected?
+// - What happens if Express starts before the DataSource is initialized?
 // - Should the CRON job start before or after the DB connection?
 // - How will you handle a failed DB connection?
 
@@ -56,13 +58,50 @@ app.use(express.json());
 // LEARNING TASK:
 //
 // You may keep a basic app.listen() here, but first implement
-// your MongoDB connection and decide whether listening should
-// only begin AFTER a successful connection.
+// your DataSource connection and decide whether listening should
+// only begin AFTER a successful initialize().
 //
 // TODO: decide your startup flow and implement it.
+//
+// ------------------------------------------
+// COMMON PITFALLS:
+//
+// - Moving/removing import "reflect-metadata" so it is NOT
+//   the first side-effect import → TypeORM decorator metadata
+//   can break in confusing ways. Keep it first.
+//
+// - app.listen() runs before DB connect + CRON start → early
+//   requests or job ticks hit an uninitialized DataSource.
+//   Gate listen on successful initialize (your choice of structure).
+//
+// - Forgetting to register routes at all → 404 everywhere even
+//   though your router files look done.
+//
+// - Mount path + router path both including the prefix
+//   (e.g. /tickets + "/tickets") → routes live at /tickets/tickets.
+//
+// - Relative import missing .js (NodeNext ESM) → runtime
+//   ERR_MODULE_NOT_FOUND after tsc/tsx build.
+//
+// - process.env.PORT is a string; that's fine for listen(),
+//   but don't do math on it without converting.
 
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
-});
+const startServer = async (): Promise<void> => {
+  try {
+    if (!AppSource.isInitialized) await AppSource.initialize();
+    console.log("[DB]: Connected to PostgreSQL");
+    app.listen(PORT, () => {
+      console.log(`[SERVER]: Server is listening on port ${PORT}`);
+    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error(error.message);
+      process.exit(1);
+    } else {
+      console.error("Unknown error:", error);
+      process.exit(1);
+    }
+  }
+};
 
-export default app;
+startServer();

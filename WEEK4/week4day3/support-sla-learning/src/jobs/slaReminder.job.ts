@@ -14,10 +14,10 @@
 // 1. Learn the node-cron API.
 // 2. Create a recurring scheduled task.
 // 3. Run it every minute while developing.
-// 4. Find overdue tickets.
+// 4. Find overdue tickets (SQL query via TypeORM).
 // 5. Ignore resolved tickets.
 // 6. Ignore tickets already reminded.
-// 7. Create a Notification.
+// 7. Create a Notification row.
 // 8. Mark the Ticket as reminded.
 //
 // ------------------------------------------
@@ -82,10 +82,49 @@
 // CRON fires
 //   → query tickets where dueAt is in the past
 //     AND status is not resolved
-//     AND slaReminderSent is false
-//   → for each ticket, create a Notification for assignedTo
+//     AND slaReminderSent = false
+//   → for each ticket, create a Notification for the assigned user
 //   → set slaReminderSent = true on that ticket
 //
 // This prevents duplicate reminders on later runs.
+//
+// HINT: with TypeORM this is a repository/QueryBuilder
+// SELECT + INSERT + UPDATE, not a Mongoose query.
+//
+// ------------------------------------------
+// COMMON PITFALLS:
+//
+// - Starting the scheduler before DataSource.initialize() →
+//   first ticks throw "Connection not established". Wire order
+//   in server.ts carefully.
+//
+// - Filtering only dueAt < now → re-notifies forever once a
+//   ticket is overdue. Also require slaReminderSent = false
+//   and a non-resolved status.
+//
+// - Treating slaReminderSent NULL as "already sent" (or the
+//   reverse) → SQL three-valued logic. Default the column and
+//   write explicit conditions.
+//
+// - Overlapping runs: job takes 90s, schedule is every minute →
+//   two jobs insert duplicate notifications. Research node-cron
+//   overlap protection / an in-flight guard flag.
+//
+// - Marking slaReminderSent = true BEFORE the notification
+//   insert commits → ticket silenced but no notification exists.
+//   Think about order of operations (and transactions enough
+//   to make a conscious choice — don't overbuild).
+//
+// - Timezone mismatch: dueAt stored/read in UTC vs you thinking
+//   in Asia/Kathmandu → "overdue" looks off by hours. Know what
+//   timezone your timestamps use.
+//
+// - Logging nothing inside the job → you can't tell if it fired.
+//   Add simple logs while learning.
+//
+// - Defining the job file but never calling it from server.ts →
+//   nothing ever runs. Wiring is part of your task.
+//
+// IMPLEMENT THIS YOURSELF.
 
 export {};

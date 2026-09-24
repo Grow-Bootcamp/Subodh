@@ -1,5 +1,3 @@
-import { Router } from "express";
-
 // ==========================================
 // LEARNING TASK: USERS (TypeORM)
 // ==========================================
@@ -63,12 +61,19 @@ import { Router } from "express";
 //   practice least-privilege responses even without auth.
 //
 // IMPLEMENT THIS YOURSELF.
+import { Router } from "express";
+import {
+  createUser,
+  getAllUsers,
+  getUserById,
+} from "../controllers/user.controller.js";
 
 const router = Router();
 
 // TODO: POST /  (create a user/agent)
-router.post("/user", createUser);
+router.post("/", createUser);
 // TODO: GET  /  (list users — id, name, email, role)
+router.get("/", getAllUsers);
+router.get("/:id", getUserById);
 
-async function createUser() {}
 export default router;

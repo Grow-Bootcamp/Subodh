@@ -1,4 +1,9 @@
 import { Router } from "express";
+import {
+  createTicket,
+  getAllTickets,
+  getTicketById,
+} from "../controllers/ticket.controller.js";
 
 // ==========================================
 // LEARNING TASK: TICKETS (TypeORM)
@@ -96,6 +101,10 @@ import { Router } from "express";
 // IMPLEMENT THE QUERIES YOURSELF.
 
 const router = Router();
+
+router.post("/", createTicket);
+router.get("/", getAllTickets);
+router.get("/:id", getTicketById);
 
 // TODO: POST /     (create a ticket)
 // TODO: GET  /     (list tickets with assignedTo relation loaded)

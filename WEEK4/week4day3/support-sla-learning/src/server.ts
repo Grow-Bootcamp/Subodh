@@ -2,6 +2,9 @@ import "reflect-metadata"; // Required for TypeORM decorators — keep this firs
 import "dotenv/config";
 import express from "express";
 import { AppSource } from "./config/db.js";
+import userRoute from "./routes/user.route.js";
+import ticketRoute from "./routes/ticket.route.js";
+import notificationRoute from "./routes/notification.route.js";
 
 // ==========================================
 // EXPRESS APPLICATION SHELL
@@ -85,6 +88,10 @@ app.use(express.json());
 //
 // - process.env.PORT is a string; that's fine for listen(),
 //   but don't do math on it without converting.
+
+app.use("/api/users", userRoute);
+app.use("/api/tickets", ticketRoute);
+app.use("/app/notifications", notificationRoute);
 
 const startServer = async (): Promise<void> => {
   try {

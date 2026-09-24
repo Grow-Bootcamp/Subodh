@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { getAllNotifications } from "../controllers/notification.controller.js";
 
 // ==========================================
 // LEARNING TASK: NOTIFICATIONS (TypeORM)
@@ -44,6 +45,7 @@ import { Router } from "express";
 // IMPLEMENT THIS YOURSELF.
 
 const router = Router();
+router.get("/", getAllNotifications);
 
 // TODO: GET /:userId  (fetch notifications for a user)
 

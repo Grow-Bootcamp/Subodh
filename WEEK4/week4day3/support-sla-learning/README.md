@@ -51,9 +51,13 @@ support-sla-learning/
 │   │   ├── Ticket.ts              <- you create the entity + User relation
 │   │   └── Notification.ts        <- you create the entity + relations
 │   ├── routes/
-│   │   ├── user.routes.ts         <- you implement POST/GET /users
-│   │   ├── ticket.routes.ts       <- you implement POST /tickets, GET /tickets, GET /tickets/:id + relation loading
-│   │   └── notification.routes.ts <- you implement GET /notifications/:userId
+│   │   ├── user.routes.ts         <- POST/GET wired to user.controller (GET handlers are stubs)
+│   │   ├── ticket.routes.ts       <- routes wired to ticket.controller (logic is stubs)
+│   │   └── notification.routes.ts <- GET /:userId wired to notification.controller (stub)
+│   ├── controllers/
+│   │   ├── user.controller.ts     <- createUser done; getAllUsers/getUserById are stubs
+│   │   ├── ticket.controller.ts   <- you implement save + relation-loaded queries
+│   │   └── notification.controller.ts <- you implement query for CRON verification
 │   ├── jobs/
 │   │   └── slaReminder.job.ts     <- you implement the CRON job
 │   └── server.ts                  <- Express shell (configured)
@@ -245,14 +249,14 @@ Convention for this project:
 
 | Method | Path | You implement |
 |--------|------|----------------|
-| POST | `/users` | Create agent |
-| GET | `/users` | List agents (id, name, email, role) |
-| POST | `/tickets` | Create ticket |
-| GET | `/tickets` | List tickets + loaded `assignedTo` |
-| GET | `/tickets/:id` | One ticket + loaded `assignedTo` (404 if missing) |
-| GET | `/notifications/:userId` | Notifications for agent |
+| POST | `/api/users` | Create agent (`createUser` done) |
+| GET | `/api/users` | List agents (id, name, email, role) — handler stub |
+| POST | `/api/tickets` | Create ticket — save logic still yours |
+| GET | `/api/tickets` | List tickets + loaded `assignedTo` — handler stub |
+| GET | `/api/tickets/:id` | One ticket + loaded `assignedTo` (404 if missing) — stub |
+| GET | `/api/notifications/:userId` | Notifications for agent — handler stub |
 
-All handlers are TODOs — you write the logic. You must also **mount the routers** in `server.ts`.
+Routers are **already mounted** in `server.ts` under `/api/*`. Controllers hold the handler logic.
 
 ---
 
@@ -274,13 +278,15 @@ Your Aiven PostgreSQL has **no application tables yet**. There is **no seed scri
 
 ## API testing guide (Postman)
 
-**Base URL:** `http://localhost:3000`  
-Optional Postman env var: `{{baseUrl}}` = `http://localhost:3000`  
+**Base URL:** `http://localhost:3000/api`  
+Optional Postman env var: `{{baseUrl}}` = `http://localhost:3000/api`  
 **POST header:** `Content-Type: application/json`
 
 Run requests in this order after `npm run dev`:
 
 ### 1. POST /users — create agent
+
+Request URL: `{{baseUrl}}/users`
 
 ```json
 {
@@ -295,9 +301,13 @@ Save the `id` — you need it for tickets and notifications.
 
 ### 2. GET /users — verify agent
 
+Request URL: `{{baseUrl}}/users`
+
 Expect: `200` array containing Alice (id, name, email, role only).
 
 ### 3. POST /tickets — overdue ticket
+
+Request URL: `{{baseUrl}}/tickets`
 
 ```json
 {
@@ -312,6 +322,8 @@ Expect: `200` array containing Alice (id, name, email, role only).
 ```
 
 ### 4. POST /tickets — future ticket
+
+Request URL: `{{baseUrl}}/tickets`
 
 ```json
 {
@@ -329,9 +341,13 @@ Expect: `201`/`200` for each. Save ticket ids.
 
 ### 5. GET /tickets — list with relation
 
+Request URL: `{{baseUrl}}/tickets`
+
 Expect: `200` array; each ticket’s `assignedTo` is a **User object** (id, name, …), not a bare id.
 
 ### 6. GET /tickets/:id — single ticket
+
+Request URL: `{{baseUrl}}/tickets/<ticketId>`
 
 Use one ticket id from step 3/4.
 
@@ -343,6 +359,8 @@ Unknown id → **404**.
 Job should run about every minute while developing (once you implement it). Watch server logs.
 
 ### 8. GET /notifications/:userId
+
+Request URL: `{{baseUrl}}/notifications/<aliceId>`
 
 Use Alice’s id.
 
@@ -365,7 +383,7 @@ Expect: `200`; notifications reference the overdue ticket, not the future one.
 
 | Symptom | Likely cause |
 |---------|----------------|
-| `404` on every path | Router not mounted in `server.ts`, or double prefix (`/tickets/tickets`) |
+| `404` on every path | Missing `/api` prefix in the URL, or router not mounted in `server.ts` |
 | `Cannot POST` / connection refused | Server not running (`npm run dev`) |
 | `500` + “relation does not exist” | Tables not created yet (DataSource/entities/`synchronize` decision) |
 | `assignedTo` is only an id | Forgot relation loading on that GET |
@@ -454,7 +472,7 @@ cd support-sla-learning
 npm run dev
 ```
 
-Then open `http://localhost:3000` (after you register routes).
+Then hit the API at `http://localhost:3000/api/...` (routers are already mounted).
 
 ---
 

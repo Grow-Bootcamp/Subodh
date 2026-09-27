@@ -1,3 +1,59 @@
+import cron from "node-cron";
+import { AppSource } from "../config/db.js";
+import Ticket, { TicketStatus } from "../entities/Ticket.js";
+import Notification from "../entities/Notification.js";
+import { In, LessThan } from "typeorm";
+
+const ticketRepo = AppSource.getRepository(Ticket);
+const notificationRepo = AppSource.getRepository(Notification);
+
+export default cron.schedule(
+  "* * * * *",
+  async () => {
+    try {
+      console.log("running a task every minute");
+      const overdueTickets = await ticketRepo.findBy({
+        dueAt: LessThan(new Date()),
+        status: In([TicketStatus.OPEN, TicketStatus.IN_PROGRESS]),
+        slaReminderSent: false,
+      });
+
+      if (overdueTickets.length === 0) return;
+
+      for (const ticket of overdueTickets) {
+        const ticketNotification = notificationRepo.create({
+          message: `Notification for ${ticket.title} with ${ticket.priority} priority. Assigned to ${ticket.assignedTo} agent`,
+          user: ticket.assignedTo,
+          ticket: ticket,
+        });
+
+        const savedTicketNotification =
+          await notificationRepo.save(ticketNotification);
+
+        if (!savedTicketNotification)
+          throw new Error(
+            `Notification for the Ticket ${ticket.id} didn't register`,
+          );
+
+        //Here you have to emit Notification with WebSocket and listen on assigned agent(ticket.assignedTo) client for it
+        ticket.slaReminderSent = true;
+        await ticketRepo.save(ticket);
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw error.message;
+      }
+      throw error;
+    }
+  },
+
+  {
+    name: "sla-notification",
+    timezone: "Asia/Kathmandu",
+    noOverlap: true,
+  },
+);
+
 // ==========================================
 // CRON LEARNING TASK
 // ==========================================
@@ -21,13 +77,7 @@
 // 8. Mark the Ticket as reminded.
 //
 // ------------------------------------------
-// CRON QUESTIONS:
-//
-// What is a CRON job?
-// How is it different from an Express endpoint?
-// Why does it run without an HTTP request?
-// What does `* * * * *` mean?
-// What happens when the Node.js process stops?
+
 //
 // ------------------------------------------
 // DUPLICATE WORK:
@@ -102,7 +152,7 @@
 //   ticket is overdue. Also require slaReminderSent = false
 //   and a non-resolved status.
 //
-// - Treating slaReminderSent NULL as "already sent" (or the
+// - Treating slaReminderSent NULL as "already sent" (or thea
 //   reverse) → SQL three-valued logic. Default the column and
 //   write explicit conditions.
 //
@@ -126,5 +176,3 @@
 //   nothing ever runs. Wiring is part of your task.
 //
 // IMPLEMENT THIS YOURSELF.
-
-export {};

@@ -2,7 +2,7 @@ import "reflect-metadata";
 import "dotenv/config";
 import express from "express";
 import { AppSource } from "./config/db.js";
-import "./jobs/slaReminder.job.js";
+import { startSlaReminderJob } from "./jobs/slaReminder.job.js";
 import userRoutes from "./routes/user.routes.js";
 import ticketRoutes from "./routes/ticket.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
@@ -20,6 +20,10 @@ const startServer = async (): Promise<void> => {
   try {
     if (!AppSource.isInitialized) await AppSource.initialize();
     console.log("[DB]: Connected to PostgreSQL");
+
+    startSlaReminderJob();
+    console.log("[CRON]: SLA reminder job started (every minute)");
+
     app.listen(PORT, () => {
       console.log(`[SERVER]: Server is listening on port ${PORT}`);
     });

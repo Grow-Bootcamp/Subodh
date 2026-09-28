@@ -8,23 +8,41 @@ const notificationResponse = (notification: Notification) => ({
   id: notification.id,
   message: notification.message,
   read: notification.read,
+  createdAt: notification.createdAt,
+  user: notification.user
+    ? { id: notification.user.id, name: notification.user.name }
+    : null,
+  ticket: notification.ticket
+    ? {
+        id: notification.ticket.id,
+        title: notification.ticket.title,
+        status: notification.ticket.status,
+        dueAt: notification.ticket.dueAt,
+      }
+    : null,
 });
 
 const getAllNotifications = async (req: Request, res: Response) => {
   try {
-    const notifications = await notificationRepo.find();
-    if (notifications.length === 0) {
-      return res.status(404).json({
+    const userId = req.params.userId;
+    if (typeof userId !== "string") {
+      return res.status(400).json({
         success: false,
-        message: "Failed to find notifications",
+        message: "Invalid user id",
       });
     }
+
+    const notifications = await notificationRepo.find({
+      where: { user: { id: userId } },
+      relations: { user: true, ticket: true },
+    });
+
     return res.status(200).json({
       success: true,
-      message: "Notifications found successfully",
-      data: notifications.map((notification) =>
-        notificationResponse(notification),
-      ),
+      message: notifications.length
+        ? "Notifications found successfully"
+        : "No notifications for this user",
+      data: notifications.map(notificationResponse),
     });
   } catch (error: unknown) {
     if (error instanceof Error) {

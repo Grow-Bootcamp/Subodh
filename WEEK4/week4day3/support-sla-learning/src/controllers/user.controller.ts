@@ -70,17 +70,11 @@ const createUser = async (req: Request, res: Response) => {
 const getAllUsers = async (req: Request, res: Response) => {
   try {
     const users = await userRepo.find();
-    if (users.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Users not found",
-      });
-    }
 
     return res.status(200).json({
       success: true,
       data: users.map((user) => userResponse(user)),
-      message: "Users successfully found",
+      message: users.length ? "Users successfully found" : "No users yet",
     });
   } catch (error: unknown) {
     if (error instanceof Error) {

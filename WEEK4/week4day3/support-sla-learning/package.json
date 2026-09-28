@@ -7,7 +7,11 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "typeorm": "tsx node_modules/typeorm/cli.js",
+    "migration:generate": "npm run typeorm -- migration:generate src/migrations/InitialSchema -d src/config/db.ts",
+    "migration:run": "npm run typeorm -- migration:run -d src/config/db.ts",
+    "migration:revert": "npm run typeorm -- migration:revert -d src/config/db.ts"
   },
   "keywords": [
     "learning",

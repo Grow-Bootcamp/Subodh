@@ -107,7 +107,7 @@ My task is to:
 1. Get my Aiven connection string.
 2. Put it into `.env` (`DATABASE_URL=`).
 3. Implement the TypeORM `DataSource` connection myself in `src/config/db.ts`.
-4. Decide how tables get created (`synchronize` vs migrations) and understand the tradeoff.
+4. Tables created via migrations (`npm run migration:generate` / `migration:run`) — understand why this beats `synchronize: true`.
 5. Verify that the application can connect.
 
 **Do not hardcode the connection string. Do not commit `.env`.**
@@ -262,17 +262,17 @@ Routers are **already mounted** in `server.ts` under `/api/*`. Controllers hold 
 
 ## First-run checklist (empty Aiven database)
 
-Your Aiven PostgreSQL has **no application tables yet**. There is **no seed script** — data is created only through **your POST APIs**.
+Your Aiven PostgreSQL tables are created **by migration** (`src/migrations/`), not `synchronize`. There is **no seed script** — data is created only through **your POST APIs**.
 
 1. Put your Aiven connection string in `.env` → `DATABASE_URL=`
 2. Implement `src/config/db.ts` (DataSource + `initialize()`)
 3. Implement the three entities (User, Ticket, Notification)
-4. Decide how tables appear: `synchronize: true` (dev) vs migrations — your learning choice
+4. Tables come from migrations: `npm run migration:generate` after entity changes, `npm run migration:run` (also auto-runs on server start via `migrationsRun: true`)
 5. Implement route handlers and mount routers in `server.ts`
 6. `npm run dev`
 7. Test with Postman (order below)
 
-**POST will fail until tables exist** — connection + entities + table creation first.
+**POST will fail until tables exist** — run the migration first.
 
 ---
 
@@ -385,7 +385,7 @@ Expect: `200`; notifications reference the overdue ticket, not the future one.
 |---------|----------------|
 | `404` on every path | Missing `/api` prefix in the URL, or router not mounted in `server.ts` |
 | `Cannot POST` / connection refused | Server not running (`npm run dev`) |
-| `500` + “relation does not exist” | Tables not created yet (DataSource/entities/`synchronize` decision) |
+| `500` + “relation does not exist” | Migration not run — `npm run migration:run` |
 | `assignedTo` is only an id | Forgot relation loading on that GET |
 | Empty `GET /notifications` | CRON not wired, not overdue yet, or filter wrong — check server logs |
 | `400`/`500` on POST | Validation/`await`/unique email — check handler error path |

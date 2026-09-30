@@ -19,7 +19,7 @@ CREATE TABLE customers (
   created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (customer_id),
   UNIQUE KEY uq_customers_email (email)
-) ENGINE=InnoDB;
+);
 
 CREATE TABLE addresses (
   address_id  INT         NOT NULL AUTO_INCREMENT,
@@ -32,7 +32,7 @@ CREATE TABLE addresses (
   PRIMARY KEY (address_id),
   CONSTRAINT fk_addresses_customer FOREIGN KEY (customer_id)
     REFERENCES customers(customer_id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
 
 CREATE TABLE categories (
   category_id INT         NOT NULL AUTO_INCREMENT,
@@ -42,7 +42,7 @@ CREATE TABLE categories (
   UNIQUE KEY uq_categories_name (name),
   CONSTRAINT fk_categories_parent FOREIGN KEY (parent_id)
     REFERENCES categories(category_id)
-) ENGINE=InnoDB;
+);
 
 CREATE TABLE products (
   product_id  INT           NOT NULL AUTO_INCREMENT,
@@ -56,7 +56,7 @@ CREATE TABLE products (
   CONSTRAINT fk_products_category FOREIGN KEY (category_id)
     REFERENCES categories(category_id),
   CONSTRAINT chk_products_price CHECK (price >= 0)
-) ENGINE=InnoDB;
+);
 
 CREATE TABLE orders (
   order_id        INT           NOT NULL AUTO_INCREMENT,
@@ -70,7 +70,7 @@ CREATE TABLE orders (
     REFERENCES customers(customer_id),
   CONSTRAINT fk_orders_address FOREIGN KEY (ship_address_id)
     REFERENCES addresses(address_id)
-) ENGINE=InnoDB;
+);
 
 CREATE TABLE order_items (
   order_id   INT           NOT NULL,
@@ -84,7 +84,7 @@ CREATE TABLE order_items (
   CONSTRAINT fk_items_product FOREIGN KEY (product_id)
     REFERENCES products(product_id),
   CONSTRAINT chk_items_quantity CHECK (quantity > 0)
-) ENGINE=InnoDB;
+);
 
 -- TASK 3.1: SHOW TABLES / DESCRIBE each table, map PK / FK / UNIQUE / NOT NULL
 -- TASK 3.2: sketch the ER diagram from the sidebar column tree

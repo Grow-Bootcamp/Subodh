@@ -59,4 +59,16 @@ DELETE FROM customers WHERE customer_id = 2;
 -- then a customer with no orders must delete fine
 INSERT INTO customers (first_name, last_name, email)
 VALUES ('Temp', 'User', 'temp@example.com');
+
+INSERT INTO products(category_id, sku, name, price, stock) 
+VALUES(1, "SKU-ELE-001", "Mouse", 1000.0, 20);
+INSERT INTO products(category_id, sku, name, price, stock) 
+VALUES(1, "SKU-ELE-002", "Keyboard", 2000.0, 10);
+INSERT INTO products(category_id, sku, name, price, stock) 
+VALUES(1, "SKU-ELE-003", "Monitor", 3000.0, 30);
+INSERT INTO products(category_id, sku, name, price, stock) 
+VALUES(1, "SKU-ELE-004", "CPU", 4000.0, 40);
+INSERT INTO products(category_id, sku, name, price, stock) 
+VALUES(1, "SKU-ELE-005", "Fridge", 5000.0, 20);
+
 DELETE FROM customers WHERE email = 'temp@example.com';

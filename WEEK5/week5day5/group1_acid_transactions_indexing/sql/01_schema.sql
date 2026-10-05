@@ -20,19 +20,6 @@ CREATE TABLE accounts (
   CONSTRAINT chk_accounts_balance CHECK (balance >= 0)  -- defence in depth: no negative balances
 );
 
-CREATE TABLE transactions_log (
-  log_id       BIGINT        NOT NULL AUTO_INCREMENT,
-  account_id   INT           NOT NULL,
-  txn_type     ENUM('debit','credit') NOT NULL,
-  amount       DECIMAL(12,2) NOT NULL,
-  balance_after DECIMAL(12,2) NOT NULL,
-  reason       VARCHAR(120)           DEFAULT NULL,
-  created_at   DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (log_id),
-  KEY idx_txn_account_created (account_id, created_at),   -- "show me this account's history" is the hot query
-  CONSTRAINT fk_txn_account FOREIGN KEY (account_id)
-    REFERENCES accounts (account_id)
-);
 
 INSERT INTO accounts (owner_name, balance) VALUES
   ('Aditi Sharma',  250000.00),
@@ -48,3 +35,17 @@ INSERT INTO accounts (owner_name, balance) VALUES
 -- Run:  SHOW CREATE TABLE transactions_log;  and find the constraint by name.
 --
 -- TODO(you): account PK = ______   log PK = ______   FK = ______ -> ______
+CREATE TABLE transactions_log(
+  log_id BIGINT NOT NULL AUTO_INCREMENT,
+  account_id INT NOT NULL,
+  txn_type ENUM('debit', 'credit') NOT NULL,
+  amount DECIMAL(12,2) NOT NULL,
+  balance_after DECIMAL(12,2) NOT NULL,
+  reason VARCHAR(120) DEFAULT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (log_id),
+  KEY idx_txn_account_created (account_id, created_at),
+  CONSTRAINT fk_txn_account FOREIGN KEY (account_id)
+    REFERENCES accounts (account_id)
+)

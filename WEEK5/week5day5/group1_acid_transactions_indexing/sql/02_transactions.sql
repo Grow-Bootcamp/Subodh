@@ -18,9 +18,12 @@ SELECT account_id, owner_name, balance FROM accounts ORDER BY account_id;
 -- TODO(you): write the whole block below, run it, then SELECT the balances.
 
 START TRANSACTION;
-
 -- ... your statements here ...
-
+UPDATE accounts SET balance = balance - 10000 WHERE account_id = 1;
+UPDATE accounts SET balance = balance + 10000 WHERE account_id = 2;
+INSERT INTO transactions_log(account_id, txn_type, amount, balance_after, reason) VALUES
+(1, 'debit', 10000, (SELECT balance FROM accounts WHERE account_id = 1), 'Transfer to Rahul'),
+(2, 'credit', 10000, (SELECT balance FROM accounts WHERE account_id = 2), 'Transfer from Aditi');
 COMMIT;
 
 SELECT account_id, owner_name, balance FROM accounts ORDER BY account_id;
@@ -42,9 +45,16 @@ SELECT * FROM transactions_log ORDER BY log_id;   -- audit rows must match the b
 
 START TRANSACTION;
 -- ... your statements ...
+UPDATE accounts SET balance = balance - 999999 WHERE account_id = 2;
+UPDATE accounts SET balance = balance + 999999 WHERE account_id = 3;
+INSERT INTO transactions_log(account_id, txn_type, amount, balance_after, reason) VALUES
+(2, 'debit', 999999, (SELECT balance FROM accounts WHERE account_id = 2), 'Transfer to Sara'),
+(3, 'credit', 999999, (SELECT balance FROM accounts WHERE account_id = 3), 'Transfer from Rahul');
 -- COMMIT;   <-- you should end up NOT committing. Why does a rollback happen?
+ROLLBACK;
 
 SELECT account_id, owner_name, balance FROM accounts ORDER BY account_id;
+SHOW ENGINE INNODB STATUS\G 
 
 -- ════ TASK 2.3 ═════════════════════════════════════════════════════════════
 -- EXPLICIT ROLLBACK on purpose: open a transaction, move ₹5,000 from
@@ -52,9 +62,13 @@ SELECT account_id, owner_name, balance FROM accounts ORDER BY account_id;
 -- run ROLLBACK instead of COMMIT. Prove the balances are untouched.
 --
 -- TODO(you): the block + proof query
-
 START TRANSACTION;
--- ...
+UPDATE accounts SET balance = balance - 5000 WHERE account_id = 6;
+UPDATE accounts SET balance = balance + 5000 WHERE account_id = 1;
+INSERT INTO transactions_log(account_id, txn_type, amount, balance_after, reason) VALUES
+(6, 'debit', 5000, (SELECT balance FROM accounts WHERE account_id = 6), 'Transfer to Aditi'),
+(1, 'credit', 5000, (SELECT balance FROM accounts WHERE account_id = 1), 'Transfer from Ops Suspense');
+-- Prove the balances are untouched by rolling back
 ROLLBACK;
 
 SELECT account_id, owner_name, balance FROM accounts ORDER BY account_id;
@@ -72,6 +86,14 @@ SELECT account_id, owner_name, balance FROM accounts ORDER BY account_id;
 -- TODO(you): paste the working IF/ELSE version here
 
 -- ... your statements ...
+START TRANSACTION;
+SELECT balance INTO @b FROM accounts WHERE account_id = 2 FOR UPDATE;
+SET @amount = 100000;
+IF @b < @amount THEN
+    ROLLBACK;
+    SELECT 'declined' AS result;
+ELSE
+    UPDATE accounts SET balance = 
 
 -- ════ TASK 2.5 ═════════════════════════════════════════════════════════════
 -- Reset the demo data whenever you want a clean slate:

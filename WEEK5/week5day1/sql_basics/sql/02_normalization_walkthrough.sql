@@ -3,6 +3,7 @@ USE shop_db;
 
 -- STEP 0: denormalized mess
 DROP TABLE IF EXISTS orders_flat;
+
 CREATE TABLE orders_flat (
   order_id       INT,
   order_date     DATE,
@@ -32,7 +33,7 @@ SELECT * FROM orders_flat;
 SELECT order_id, COUNT(*) AS copies
 FROM orders_flat
 GROUP BY order_id
-HAVING COUNT(*) > 1;
+HAVING COUNT(*)>1;
 
 SELECT COUNT(*) AS rows_to_patch
 FROM orders_flat
@@ -95,12 +96,17 @@ CREATE TABLE order_lines_2nf (
     REFERENCES customers_2nf(customer_id)
 );
 
-INSERT INTO order_lines_2nf (order_id, order_date, customer_id, product_name, quantity, price)
-SELECT line_id, order_date, c.customer_id, product_name, quantity, price
+INSERT INTO order_lines_2nf (line_id, order_id, order_date, customer_id, product_name, quantity, price)
+SELECT line_id, order_id, order_date, c.customer_id, product_name, quantity, price
 FROM orders_1nf o
 JOIN customers_2nf c ON c.customer_email = o.customer_email;
 
+
 -- TASK 2.3: update Ana's city once (UPDATE customers_2nf ...), then verify via join
+UPDATE customers_2nf
+SET customer_city = "Panjab"
+WHERE customer_id = 1;
+
 SELECT o.line_id, c.customer_name, c.customer_city, o.product_name
 FROM order_lines_2nf o
 JOIN customers_2nf c ON c.customer_id = o.customer_id;

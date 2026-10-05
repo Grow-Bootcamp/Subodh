@@ -1,0 +1,74 @@
+-- 03_isolation_acid.sql — see Isolation happen, with TWO clients
+--
+-- REAL WORLD: two employees click "pay salary" and "withdraw" on the SAME
+-- account at the same millisecond. Isolation decides whether one sees the
+-- other's half-finished work. MySQL/InnoDB's default is REPEATABLE READ.
+--
+-- HOW TO RUN THIS FILE: you need TWO terminals both attached to the DB.
+--   Terminal A:  docker compose exec mysql mysql -uroot -p'root_pw' bank_db
+--   Terminal B:  docker compose exec mysql mysql -uroot -p'root_pw' bank_db
+-- Statements below are labelled A/B — run them in that terminal, in order.
+
+-- Reset so everyone starts from the same numbers:
+--   docker compose exec -T mysql mysql -uroot -p'root_pw' bank_db < sql/01_schema.sql
+
+-- ════ TASK 3.1 ═════════════════════════════════════════════════════════════
+-- DIRTY READ check (can I read a row another session has NOT committed?):
+--   A: START TRANSACTION;
+--      UPDATE accounts SET balance = 1 WHERE account_id = 4;   -- don't commit
+--   B: SELECT balance FROM accounts WHERE account_id = 4;      -- what do you see?
+--   A: ROLLBACK;
+--   B: SELECT balance FROM accounts WHERE account_id = 4;
+--
+-- InnoDB blocks dirty reads (you see the OLD value, not 1). Older engines
+-- like MyISAM would have returned 1.
+-- TODO(you): B saw ______ before ROLLBACK, and ______ after.
+
+-- ════ TASK 3.2 ═════════════════════════════════════════════════════════════
+-- NON-REPEATABLE READ (same row, two reads, different answer):
+--   A: SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+--      START TRANSACTION;
+--      SELECT balance FROM accounts WHERE account_id = 1;   -- 1st read
+--   B: UPDATE accounts SET balance = balance - 1000 WHERE account_id = 1;
+--      COMMIT;
+--   A: SELECT balance FROM accounts WHERE account_id = 1;   -- 2nd read
+--      COMMIT;
+-- Now REPEAT the whole task with the default REPEATABLE READ:
+--   A: SET TRANSACTION ISOLATION LEVEL REPEATABLE READ; START TRANSACTION; ...
+-- TODO(you): under READ COMMITTED the two reads were ____ and ____;
+--            under REPEATABLE READ they were ____ and ____.
+
+-- ════ TASK 3.3 ═════════════════════════════════════════════════════════════
+-- PHANTOM (a row that appears between reads of a RANGE):
+--   A: SET TRANSACTION ISOLATION LEVEL READ COMMITTED; START TRANSACTION;
+--      SELECT COUNT(*) FROM accounts WHERE balance >= 100000;
+--   B: INSERT INTO accounts (owner_name, balance) VALUES ('New Millionaire', 500000);
+--      COMMIT;
+--   A: SELECT COUNT(*) FROM accounts WHERE balance >= 100000;  -- count changed?
+--      COMMIT;
+-- TODO(you): the count went from ____ to ____. Under REPEATABLE READ InnoDB
+--            avoids this for plain SELECTs using MVCC (a snapshot), but a
+--            locking read (SELECT ... FOR UPDATE) would still block/wait.
+
+-- ════ TASK 3.4 ═════════════════════════════════════════════════════════════
+-- LOST UPDATE (the classic concurrency bug):
+--   A: START TRANSACTION;
+--      SELECT balance FROM accounts WHERE account_id = 5;   -- reads 120000
+--   B: START TRANSACTION;
+--      UPDATE accounts SET balance = balance - 20000 WHERE account_id = 5;
+--      COMMIT;
+--   A: UPDATE accounts SET balance = 120000 - 30000 WHERE account_id = 5;  -- overwrites B!
+--      COMMIT;
+-- Fix it: re-run with `SELECT ... FOR UPDATE` on A's first read — B must then
+-- WAIT until A commits (row lock), so A's arithmetic can't be clobbered.
+-- TODO(you): final balance without FOR UPDATE = ____; with FOR UPDATE = ____.
+--            (correct answer is 120000 - 20000 - 30000 = 70000)
+
+-- ════ TASK 3.5 ═════════════════════════════════════════════════════════════
+-- ACID checklist — write one sentence each, from what you OBSERVED above:
+--   Atomicity : TODO(you)
+--   Consistency: TODO(you)   (hint: CHECK constraint, balance always sums)
+--   Isolation : TODO(you)
+--   Durability: TODO(you)   (hint: COMMIT returns -> data survives `docker compose restart`)
+
+-- Prove durability: COMMIT something, `docker compose restart`, SELECT again.

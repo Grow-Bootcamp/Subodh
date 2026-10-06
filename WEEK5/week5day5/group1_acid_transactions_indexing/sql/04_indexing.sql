@@ -62,7 +62,7 @@ EXPLAIN SELECT * FROM customers_index_demo WHERE email = 'user01234@example.com'
 -- COMPOSITE index for the two-column filter. Order matters:
 -- (city, signup_date) can serve a city-only filter AND city+date,
 -- but NEVER signup_date alone (the leftmost prefix rule).
-CREATE INDEX idx_city_signup ON customers_index_demo (city, signup_date);
+CREATE INDEX idx_full_name ON customers_index_demo (full_name);
 
 EXPLAIN SELECT * FROM customers_index_demo WHERE city = 'Pune' AND signup_date BETWEEN '2023-06-01' AND '2023-12-31';
 EXPLAIN SELECT * FROM customers_index_demo WHERE signup_date BETWEEN '2023-06-01' AND '2023-12-31';  -- leftmost prefix violated

@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import pool from "../db.js";
+import { ResultSetHeader } from "mysql2/promise";
 
 const router = Router();
 
@@ -17,10 +18,13 @@ const router = Router();
 router.get("/search", async (req: Request, res: Response) => {
   const q = String(req.query.q ?? "");
 
-  // ── TODO(you): replace this stub ──
-  res.status(501).json({
-    message: "Not implemented — see TODO in src/routes/accounts.ts",
-    expected: `EXPLAIN plan for WHERE full_name = '${q}'`,
+  const query =
+    "EXPLAIN SELECT * FROM customers_index_demo WHERE full_name = ?";
+  const [rows] = await pool.execute(query, [q]);
+
+  res.status(200).json({
+    query: query,
+    plan: rows,
   });
 });
 
@@ -65,21 +69,97 @@ router.post("/:id/transfer", async (req: Request, res: Response) => {
 
   // sanity checks are safe even before you implement the transaction
   if (!to || !amount || amount <= 0) {
-    res.status(400).json({ message: "Body needs { to, amount } with amount > 0" });
+    res
+      .status(400)
+      .json({ message: "Body needs { to, amount } with amount > 0" });
     return;
   }
 
-  // ── TODO(you): replace this stub with the 8 steps above ──
-  res.status(501).json({
-    message: "Not implemented — see TODO in src/routes/accounts.ts",
-    expected: {
-      from: fromId,
-      to,
+  const conn = await pool.getConnection();
+  if (!conn) {
+    res.status(500).json({ message: "Failed to get database connection" });
+    return;
+  }
+  try {
+    await conn.beginTransaction();
+    const senderQ =
+      "UPDATE accounts SET balance = balance - ? WHERE account_id = ? AND balance >= ?";
+    const receiverQ =
+      "UPDATE accounts SET balance = balance + ? WHERE account_id = ?";
+    const senderBalanceQ = "SELECT balance FROM accounts WHERE account_id = ?";
+    const receiverBalanceQ =
+      "SELECT balance FROM accounts WHERE account_id = ?";
+    const logQ =
+      "INSERT INTO transactions_log (account_id, txn_type, amount, reason, balance_after) VALUES (?, ?, ?, ?, ?)";
+
+    // 3. Deduct from sender (includes overdraft check)
+    const [senderResult] = await conn.execute<ResultSetHeader>(senderQ, [
       amount,
-      reason: reason ?? null,
-      effect: "debit from, credit to, write 2 rows into transactions_log, all in one transaction",
-    },
-  });
+      fromId,
+      amount,
+    ]);
+    if (senderResult.affectedRows === 0) {
+      await conn.rollback();
+      res.status(400).json({ message: "Insufficient funds / invalid amount" });
+      return;
+    }
+
+    const [receiverResult] = await conn.execute<ResultSetHeader>(receiverQ, [
+      amount,
+      to,
+    ]);
+    if (receiverResult.affectedRows === 0) {
+      await conn.rollback();
+      res.status(400).json({ message: "Receiver account not found" });
+      return;
+    }
+
+    // Get updated balances for logging
+    const [senderBalanceRows] = await conn.execute(senderBalanceQ, [fromId]);
+    const [receiverBalanceRows] = await conn.execute(receiverBalanceQ, [to]);
+
+    const senderBalanceAfter = (senderBalanceRows as any[])[0].balance;
+    const receiverBalanceAfter = (receiverBalanceRows as any[])[0].balance;
+
+    // 6. Log the transactions
+    await conn.execute(logQ, [
+      fromId,
+      "debit",
+      amount,
+      reason ?? null,
+      senderBalanceAfter,
+    ]);
+    await conn.execute(logQ, [
+      to,
+      "credit",
+      amount,
+      reason ?? null,
+      receiverBalanceAfter,
+    ]);
+
+    // 7. Commit the transaction
+    await conn.commit();
+    res.status(200).json({
+      message: "Transfer successful",
+      queries: [senderQ, receiverQ, logQ, senderBalanceQ, receiverBalanceQ],
+      expected: {
+        from: fromId,
+        to,
+        amount,
+        reason: reason ?? null,
+        effect: `debit from account with id ${fromId}, credit to account with id ${to}, write 2 rows into transactions_log, all in one transaction`,
+      },
+    });
+  } catch (err: any) {
+    if (conn) {
+      await conn.rollback();
+    }
+    res.status(500).json({ message: err.message });
+  } finally {
+    if (conn) {
+      conn.release();
+    }
+  }
 });
 
 export default router;

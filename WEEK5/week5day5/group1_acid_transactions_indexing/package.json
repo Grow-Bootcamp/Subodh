@@ -1,0 +1,32 @@
+{
+  "name": "group1_acid_transactions_indexing",
+  "version": "0.1.0",
+  "description": "Learning scaffold: ACID, MySQL transactions and indexing (bank payment service)",
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:reset": "docker compose down -v && docker compose up -d",
+    "db:ps": "docker compose ps",
+    "schema": "docker compose exec -T mysql mysql -uroot -p'root_pw' bank_db < sql/01_schema.sql"
+  },
+  "keywords": ["learning", "mysql", "acid", "transactions", "indexing", "express"],
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^18.0.3",
+    "express": "^5.2.1",
+    "morgan": "^1.12.1",
+    "mysql2": "^3.24.5"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^26.6.2",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

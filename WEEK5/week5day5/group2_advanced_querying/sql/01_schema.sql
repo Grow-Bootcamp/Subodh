@@ -1,8 +1,5 @@
--- 01_schema.sql — e-commerce schema for the reporting/dashboard API (run FIRST)
--- REAL WORLD: an admin dashboard never asks for "everything". It asks for
--- "orders in the last 30 days, filtered, sorted, paged, and grouped by day".
--- This file builds that dataset with enough rows that GROUP BY and LIMIT
--- behave like they do in production.
+-- 01_schema.sql — e-commerce schema for the dashboard API (run FIRST)
+-- Seeded with enough rows that GROUP BY and LIMIT behave like production.
 USE commerce_db;
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -91,7 +88,6 @@ SELECT
   IF(n MOD 25 = 0, 0, 1)          -- every 25th product is discontinued
 FROM seq;
 
--- 400 orders spread across the last 400 days
 INSERT INTO orders (customer_id, status, placed_at)
 WITH RECURSIVE seq AS (SELECT 1 AS n UNION ALL SELECT n + 1 FROM seq WHERE n < 400)
 SELECT
@@ -100,7 +96,7 @@ SELECT
   DATE_SUB(NOW(), INTERVAL (n MOD 400) DAY) - INTERVAL (n MOD 20) HOUR
 FROM seq;
 
--- 1200 lines ≈ 3 items per order; unit_price is copied from products at "sale" time
+-- 1200 lines ≈ 3 items per order
 SET SESSION cte_max_recursion_depth = 5000;   -- default is 1000; our CTE walks to 1200
 INSERT INTO order_items (order_id, product_id, quantity, unit_price)
 WITH RECURSIVE seq AS (SELECT 1 AS n UNION ALL SELECT n + 1 FROM seq WHERE n < 1200)
@@ -117,7 +113,6 @@ SELECT
   (SELECT COUNT(*) FROM orders)     AS orders,
   (SELECT COUNT(*) FROM order_items) AS order_items;
 
--- ════ TASK 1.1 ═════════════════════════════════════════════════════════════
--- Why does order_items.unit_price exist when products.price already does?
--- What breaks in a report if you always join products.price instead?
--- TODO(you): your answer
+-- TASK 1.1: why does order_items.unit_price exist when products.price does?
+--           What breaks in a report if you always join products.price?
+-- TODO(you):

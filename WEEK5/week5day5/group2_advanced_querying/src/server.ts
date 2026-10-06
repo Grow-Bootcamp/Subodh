@@ -14,7 +14,7 @@ app.get("/", (_req: Request, res: Response) => {
     group: "Group 2 — Advanced SQL Querying & Weekly Consolidation",
     endpoints: [
       "GET  /products                              (worked example)",
-      "GET  /products?category=&minPrice=&active=&sort=&page=&limit=   (TODO)",
+      "GET  /products/search?category=&minPrice=&active=&sort=&page=&limit=   (TODO)",
       "GET  /reports/sales/summary?days=30                          (TODO)",
       "GET  /reports/top-products?limit=10                          (TODO)",
     ],

@@ -3,9 +3,8 @@
 An **e-commerce admin dashboard API**: filter, sort, paginate and aggregate a
 real dataset — the same four skills every reporting screen needs.
 
-> SQL files are commented guides — **YOU** run them. Tasks are marked
-> `═══ TASK x.y ═══` and answers go in the `TODO(you)` slots. The Express side
-> turns the same queries into dashboard endpoints.
+> SQL files are commented guides — **YOU** run them (`TODO(you)` slots); the
+> Express side turns the same queries into dashboard endpoints.
 
 ## 1. Start MySQL + install
 
@@ -28,8 +27,7 @@ npm run dev                        # http://127.0.0.1:3002
 CLI client (or the VS Code MySQL extension):
 
 ```bash
-docker compose exec mysql mysql -uroot -p'root_pw' commerce_db
-mysql> SHOW TABLES;
+docker compose exec mysql mysql -uroot -p'root_pw' commerce_db   # then: SHOW TABLES;
 ```
 
 ## 2. The query engine's order of evaluation
@@ -40,23 +38,17 @@ FROM / JOIN  ->  WHERE  ->  GROUP BY  ->  HAVING  ->  SELECT  ->  ORDER BY  ->  
 ```
 
 `WHERE` can never see an aggregate; `HAVING` always can. Nearly every mistake
-in this lab is "wrong clause, right expression".
-
-| Real-world need | Clause / function |
-| --- | --- |
-| Toolbar filters | `WHERE ... AND/OR/IN/BETWEEN/LIKE` |
-| Sort control | `ORDER BY col [ASC\|DESC], col2 ...` |
-| Next/Prev page | `LIMIT ? OFFSET ?` + a separate `COUNT(*)` |
-| KPI cards | `COUNT/SUM/AVG/MIN/MAX` |
-| Per-group KPIs | `GROUP BY ... HAVING ...` |
+in this lab is "wrong clause, right expression" — filters use `WHERE`
+(`AND/OR/IN/BETWEEN/LIKE`), grouping uses `GROUP BY ... HAVING ...`, paging
+uses `LIMIT ? OFFSET ?` plus a separate `COUNT(*)`.
 
 ## 3. Run order & checklist
 
 | # | File | What you do | ✓ |
 | --- | --- | --- | --- |
 | 1 | `sql/01_schema.sql` | Run all; TASK 1.1 (why snapshot `unit_price`?) | ☐ |
-| 2 | `sql/02_filter_sort_paginate.sql` | TASK 2.1 filters, 2.2 sorting, 2.3 paging, 2.4 OFFSET trap + keyset, 2.5 combined exercise | ☐ |
-| 3 | `sql/03_groupby_aggregates.sql` | TASK 3.1 groups, 3.2 five aggregates, 3.3 WHERE vs HAVING, 3.4 multi-col + HAVING, 3.5 traps, 3.6 executive summary | ☐ |
+| 2 | `sql/02_filter_sort_paginate.sql` | TASK 2.1 filters, 2.2 sorting, 2.3 paging + COUNT, 2.4 OFFSET trap + keyset | ☐ |
+| 3 | `sql/03_groupby_aggregates.sql` | TASK 3.1 groups, 3.2 five aggregates, 3.3 WHERE vs HAVING, 3.4 AOV + HAVING, 3.5 traps, 3.6 executive summary | ☐ |
 | 4 | `src/routes/products.ts` | Implement `GET /products/search` (dynamic WHERE + sort whitelist + paging + COUNT) | ☐ |
 | 5 | `src/routes/reports.ts` | Implement `GET /reports/sales/summary` (daily revenue) | ☐ |
 | 6 | `src/routes/reports.ts` | Implement `GET /reports/top-products` (+ the "top cities" HAVING variant) | ☐ |
@@ -78,11 +70,9 @@ curl 'http://127.0.0.1:3002/products/search?sort=%3B%20DROP%20TABLE%20products'
 
 ## 5. Real-world task (the point of this lab)
 
-> **Spec:** a dashboard where the user filters by category + minimum price,
-> picks a sort order, and pages through results — with a correct total count —
-> and sees three KPI cards: daily revenue, top products, top cities.
-
-Acceptance checks you run yourself:
+Spec: filter by category + min price, pick a sort order, page through results
+with a correct total — plus three KPI cards: daily revenue, top products,
+top cities. Acceptance checks you run yourself:
 
 - [ ] `page=1` and `page=2` never return the same row (with `ORDER BY` set).
 - [ ] `total` from `COUNT(*)` matches `items.length` when `limit >= total`.

@@ -22,7 +22,7 @@
 --
 -- InnoDB blocks dirty reads (you see the OLD value, not 1). Older engines
 -- like MyISAM would have returned 1.
--- TODO(you): B saw ______ before ROLLBACK, and ______ after.
+-- TODO(you): B saw 0 before ROLLBACK, and 0 after.
 
 -- ════ TASK 3.2 ═════════════════════════════════════════════════════════════
 -- NON-REPEATABLE READ (same row, two reads, different answer):
@@ -35,8 +35,8 @@
 --      COMMIT;
 -- Now REPEAT the whole task with the default REPEATABLE READ:
 --   A: SET TRANSACTION ISOLATION LEVEL REPEATABLE READ; START TRANSACTION; ...
--- TODO(you): under READ COMMITTED the two reads were ____ and ____;
---            under REPEATABLE READ they were ____ and ____.
+-- TODO(you): under READ COMMITTED the two reads were  250000.00 and 249000.00 ;
+--            under REPEATABLE READ they were  249000.00 and 249000.00 .
 
 -- ════ TASK 3.3 ═════════════════════════════════════════════════════════════
 -- PHANTOM (a row that appears between reads of a RANGE):
@@ -46,7 +46,7 @@
 --      COMMIT;
 --   A: SELECT COUNT(*) FROM accounts WHERE balance >= 100000;  -- count changed?
 --      COMMIT;
--- TODO(you): the count went from ____ to ____. Under REPEATABLE READ InnoDB
+-- TODO(you): the count went from 3 to 4. Under REPEATABLE READ InnoDB
 --            avoids this for plain SELECTs using MVCC (a snapshot), but a
 --            locking read (SELECT ... FOR UPDATE) would still block/wait.
 
@@ -61,14 +61,14 @@
 --      COMMIT;
 -- Fix it: re-run with `SELECT ... FOR UPDATE` on A's first read — B must then
 -- WAIT until A commits (row lock), so A's arithmetic can't be clobbered.
--- TODO(you): final balance without FOR UPDATE = ____; with FOR UPDATE = ____.
---            (correct answer is 120000 - 20000 - 30000 = 70000)
+-- TODO(you): final balance without FOR UPDATE = 90000; with FOR UPDATE = 70000.
+--            (correct answer is 120000 - 30000 - 20000 = 70000)
 
 -- ════ TASK 3.5 ═════════════════════════════════════════════════════════════
 -- ACID checklist — write one sentence each, from what you OBSERVED above:
---   Atomicity : TODO(you)
---   Consistency: TODO(you)   (hint: CHECK constraint, balance always sums)
---   Isolation : TODO(you)
---   Durability: TODO(you)   (hint: COMMIT returns -> data survives `docker compose restart`)
+--   Atomicity : Rollback undoes all of a transaction's changes, even if some were already written to disk.
+--   Consistency: Consistency is maintained because transactions transition the database from one valid state to another, ensuring that all integrity constraints are satisfied.
+--   Isolation : Isolation ensures that concurrent transactions do not interfere with each other, maintaining data consistency.
+--   Durability: Durability ensures that once a transaction is committed, its changes are permanently stored in the database, even in the event of a system failure.
 
 -- Prove durability: COMMIT something, `docker compose restart`, SELECT again.

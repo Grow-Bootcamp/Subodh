@@ -47,15 +47,16 @@ EXPLAIN SELECT * FROM customers_index_demo WHERE city = 'Pune' AND signup_date B
 --   type = ALL   -> full table scan (worst)
 --   key  = NULL  -> no index used
 --   rows = 50000 -> every row examined
--- TODO(you): type=____ key=____ rows=____ for the email query.
+-- TODO(you): type=ALL key=(NULL) rows=49910 for the email query.
 
 -- ════ TASK 4.2 ═════════════════════════════════════════════════════════════
 -- ADD the index, then re-run Task 4.1's EXPLAINs.
-CREATE INDEX idx_customers_email ON customers_index_demo (email);
+
+CREATE INDEX idx_customers_email ON customers_index_demo (email);  -- duplicate index, MySQL ignores it
 
 EXPLAIN SELECT * FROM customers_index_demo WHERE email = 'user01234@example.com';
 --
--- TODO(you): type=____ key=____ rows=____ .  What happened to "rows"?
+-- TODO(you): type=ref key=idx_customers_email rows=1 .  What happened to "rows"?
 
 -- ════ TASK 4.3 ═════════════════════════════════════════════════════════════
 -- COMPOSITE index for the two-column filter. Order matters:
@@ -66,25 +67,24 @@ CREATE INDEX idx_city_signup ON customers_index_demo (city, signup_date);
 EXPLAIN SELECT * FROM customers_index_demo WHERE city = 'Pune' AND signup_date BETWEEN '2023-06-01' AND '2023-12-31';
 EXPLAIN SELECT * FROM customers_index_demo WHERE signup_date BETWEEN '2023-06-01' AND '2023-12-31';  -- leftmost prefix violated
 --
--- TODO(you): first EXPLAIN key=____ ; second EXPLAIN key=____ (why?)
+-- TODO(you): first EXPLAIN key=idx_city_signup ; second EXPLAIN key=(NULL) (why?)
+
 
 -- ════ TASK 4.4 ═════════════════════════════════════════════════════════════
--- TIMING proof — feel the difference instead of trusting EXPLAIN:
-SET @t0 = NOW(6);
-SELECT * FROM customers_index_demo WHERE email = 'user04999@example.com';
-SELECT TIMESTAMPDIFF(MICROSECOND, @t0, NOW(6)) AS micros_without_index_scope;
--- (run this BEFORE creating the email index for a fair comparison)
-
--- ════ TASK 4.5 ═════════════════════════════════════════════════════════════
 -- INDEXES ARE NOT FREE. They slow down every INSERT/UPDATE/DELETE, because
 -- each index must be maintained alongside the row.
 --   INSERT INTO customers_index_demo (full_name, email, city, signup_date)
 --   VALUES ('New User', 'new@example.com', 'Pune', '2024-01-01');
 -- Then measure again with:  DROP INDEX idx_customers_email ON customers_index_demo;
 --
+INSERT INTO customers_index_demo (full_name, email, city, signup_date)
+VALUES ('New User 1', 'new3@example.com', 'Pune', '2024-01-01');
+DROP INDEX idx_customers_email ON customers_index_demo;
+DROP INDEX idx_city_signup ON customers_index_demo;
 -- Real-world rule of thumb: index what you WHERE / ORDER BY / JOIN on; never
 -- blindly index every column.
 -- TODO(you): list which tables you'd index in `bank_db` and for which query.
 
 -- ════ TASK 4.6 ═════════════════════════════════════════════════════════════
 -- CLEANUP when you're done:  DROP TABLE customers_index_demo;
+DROP TABLE customers_index_demo;

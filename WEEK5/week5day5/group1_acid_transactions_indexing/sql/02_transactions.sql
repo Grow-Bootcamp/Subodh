@@ -86,15 +86,60 @@ SELECT account_id, owner_name, balance FROM accounts ORDER BY account_id;
 -- TODO(you): paste the working IF/ELSE version here
 
 -- ... your statements ...
-START TRANSACTION;
-SELECT balance INTO @b FROM accounts WHERE account_id = 2 FOR UPDATE;
-SET @amount = 100000;
-IF @b < @amount THEN
-    ROLLBACK;
-    SELECT 'declined' AS result;
-ELSE
-    UPDATE accounts SET balance = 
+DELIMITER //
 
+CREATE PROCEDURE Transfer_funds(
+    IN amount INT,
+    IN sender_id INT,
+    IN receiver_id INT
+)
+BEGIN
+    -- Declare all local variables at the top of the block
+    DECLARE v_b DECIMAL(15,2);
+    DECLARE v_sender_name VARCHAR(100);
+    DECLARE v_receiver_name VARCHAR(100);
+    DECLARE message VARCHAR(255);
+
+    START TRANSACTION;
+    
+    -- Lock sender's row and retrieve balance & name in a single query
+    SELECT balance, owner_name INTO v_b, v_sender_name 
+    FROM accounts 
+    WHERE account_id = sender_id 
+    FOR UPDATE;
+
+    -- Fetch receiver's name
+    SELECT owner_name INTO v_receiver_name 
+    FROM accounts 
+    WHERE account_id = receiver_id;
+    
+    IF v_b < amount THEN
+        ROLLBACK;
+        SELECT 'declined' AS result;
+    ELSE
+        -- Update account balances
+        UPDATE accounts SET balance = balance - amount WHERE account_id = sender_id;
+        UPDATE accounts SET balance = balance + amount WHERE account_id = receiver_id;
+        
+        -- Construct message using internal variables
+        SET message = CONCAT('Transfer of ', amount, ' from ', v_sender_name, ' to ', v_receiver_name, ' completed successfully.');
+        
+        -- Log transaction details
+        INSERT INTO transactions_log(account_id, txn_type, amount, balance_after, reason) VALUES
+        (sender_id, 'debit', amount, v_b - amount, message),
+        (receiver_id, 'credit', amount, (SELECT balance FROM accounts WHERE account_id = receiver_id), message);
+        
+        COMMIT;
+        SELECT 'ok' AS result;
+    END IF;
+END //
+
+DELIMITER ;
+
+CALL Transfer_funds(100000, 2, 3);
+CALL Transfer_funds(1000, 2, 3);
+SELECT * FROM transactions_log ORDER BY log_id;
+TRUNCATE transactions_log; -- Clear the log
 -- ════ TASK 2.5 ═════════════════════════════════════════════════════════════
 -- Reset the demo data whenever you want a clean slate:
 --   docker compose exec -T mysql mysql -uroot -p'root_pw' bank_db < sql/01_schema.sql

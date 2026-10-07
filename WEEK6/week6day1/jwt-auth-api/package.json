@@ -1,0 +1,29 @@
+{
+  "name": "jwt-auth-api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Minimal Express + TypeScript REST API starter for practicing JWT authentication",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^18.0.5",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^4.3.11"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^26.6.4",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}

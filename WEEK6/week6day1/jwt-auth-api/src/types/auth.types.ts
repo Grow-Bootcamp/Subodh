@@ -1,4 +1,4 @@
-import type { JwtPayload } from 'jsonwebtoken';
+import type { JwtPayload } from "jsonwebtoken";
 
 /**
  * The user information you want to carry inside a JWT.
@@ -6,8 +6,9 @@ import type { JwtPayload } from 'jsonwebtoken';
  */
 export interface AuthUser {
   id: string;
-  email: string;
-  name: string;
+  role: string; // optional role for authorization (e.g., "admin", "user")
+  email?: string;
+  name?: string;
 }
 
 /**
@@ -16,6 +17,9 @@ export interface AuthUser {
  */
 export interface AppJwtPayload extends JwtPayload {
   user: AuthUser;
+  iat?: number; // issued at (seconds since epoch)
+  exp?: number; // expiration time (seconds since epoch)
+  iss?: string; // optional issuer claim for additional security
 }
 
 /**
@@ -25,7 +29,7 @@ export interface AppJwtPayload extends JwtPayload {
  * TODO (learning): after implementing auth.middleware.ts, this is what makes
  * `req.user` type-safe instead of `any`.
  */
-declare module 'express-serve-static-core' {
+declare module "express-serve-static-core" {
   interface Request {
     user?: AuthUser;
   }

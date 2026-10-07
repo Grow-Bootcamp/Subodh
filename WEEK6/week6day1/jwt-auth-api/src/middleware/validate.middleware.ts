@@ -1,4 +1,4 @@
-import type { NextFunction, Request, RequestHandler, Response } from 'express';
+import type { NextFunction, Request, RequestHandler, Response } from "express";
 
 /**
  * Anything with a parse() method works (Zod schemas do),
@@ -18,7 +18,7 @@ type Parser<T> = {
  * On failure  -> the ZodError is forwarded to the centralized error handler (400)
  */
 export function validate<T>(schema: Parser<T>): RequestHandler {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
     try {
       req.body = schema.parse(req.body);
       next();

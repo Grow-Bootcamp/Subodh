@@ -3,6 +3,7 @@ export enum UserRole {
   ADMIN = "admin",
 }
 
+/** Demo user record (plain-text password, in-memory only). */
 export interface User {
   id: number;
   email: string;
@@ -10,14 +11,14 @@ export interface User {
   role: UserRole;
 }
 
-/** Safe subset of the user that is sent back to the client. */
+/** Safe subset of the user sent back to the client. */
 export interface AuthenticatedUser {
   id: number;
   email: string;
   role: UserRole;
 }
 
-/** Conceptual shape of the access JWT payload. */
+/** Access JWT payload: { sub: "2", email, role, type: "access" } */
 export interface AccessTokenPayload {
   sub: string;
   email: string;
@@ -25,7 +26,7 @@ export interface AccessTokenPayload {
   type: "access";
 }
 
-/** Conceptual shape of the refresh JWT payload. */
+/** Refresh JWT payload: { sub: "2", type: "refresh" } */
 export interface RefreshTokenPayload {
   sub: string;
   type: "refresh";
@@ -34,7 +35,7 @@ export interface RefreshTokenPayload {
 declare global {
   namespace Express {
     interface Request {
-      /** Set by the `authenticate` middleware once you implement it. */
+      /** Set by the `authenticate` middleware. */
       user?: AuthenticatedUser;
     }
   }

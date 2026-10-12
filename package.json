@@ -1,0 +1,43 @@
+{
+  "name": "growbootcamp",
+  "private": true,
+  "workspaces": [
+    "WEEK2/week2day2/docker-compose-demo/api",
+    "WEEK2/week2day2/docker-compose-demo/client",
+    "WEEK2/week2day2/docker-demo",
+    "WEEK2/week2day2/oauth-demo",
+    "WEEK2/week2day2/typescript-demo",
+    "WEEK2/week2day3",
+    "WEEK3/week3day1/mongo-db",
+    "WEEK3/week3day3",
+    "WEEK3/week3day4",
+    "WEEK3/week3day5/middleware",
+    "WEEK3/week3day5/template_engine",
+    "WEEK4/week4day1",
+    "WEEK4/week4day2",
+    "WEEK4/week4day3/support-sla-learning",
+    "WEEK4/week4day5/express_error_logging",
+    "WEEK5/week5day5/group1_acid_transactions_indexing",
+    "WEEK5/week5day5/group2_advanced_querying",
+    "WEEK6/week6day1/jwt-auth-api",
+    "WEEK6/week6day2/task-api",
+    "WEEK6/week6day3",
+    "WEEK6/week6day4/react-lifecycle-methods",
+    "tools"
+  ],
+  "dependencies": {
+    "express": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "typescript": "^7.0.2"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "esbuild@0.21.5": true,
+    "@parcel/watcher@2.6.0": true,
+    "unrs-resolver@1.12.2": true
+  }
+}

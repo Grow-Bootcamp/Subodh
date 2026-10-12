@@ -9,9 +9,9 @@
     "type-check": "tsc --noEmit",
     "build": "tsc",
     "prod": "node dist/index.js",
-    "migration:generate": "tsx node_modules/typeorm/cli.js migration:generate -d data-source.ts",
-    "migration:run": "tsx node_modules/typeorm/cli.js migration:run -d data-source.ts",
-    "migration:revert": "tsx node_modules/typeorm/cli.js migration:revert -d data-source.ts"
+    "migration:generate": "tsx $(node -p \"require.resolve('typeorm/cli.js')\") migration:generate -d data-source.ts",
+    "migration:run": "tsx $(node -p \"require.resolve('typeorm/cli.js')\") migration:run -d data-source.ts",
+    "migration:revert": "tsx $(node -p \"require.resolve('typeorm/cli.js')\") migration:revert -d data-source.ts"
   },
   "keywords": [],
   "author": "",

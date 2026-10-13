@@ -23,7 +23,8 @@
     "WEEK6/week6day2/task-api",
     "WEEK6/week6day3",
     "WEEK6/week6day4/react-lifecycle-methods",
-    "tools"
+    "tools",
+    "WEEK6/week6day5"
   ],
   "dependencies": {
     "express": "^5.3.0"

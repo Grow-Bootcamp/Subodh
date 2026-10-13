@@ -12,10 +12,29 @@ app.use(
 
 app.use(express.json());
 
+//Stored in Database
 const users = [
-  { id: 1, name: "Alice", role: "Engineer" },
-  { id: 2, name: "Bob", role: "Designer" },
-  { id: 3, name: "Carol", role: "Product Manager" },
+  {
+    id: 1,
+    name: "Subodh",
+    email: "subodhshah@gmail.com",
+    password: "adminsubodh",
+    role: "admin",
+  },
+  {
+    id: 2,
+    name: "Bob",
+    email: "bob@gmail.com",
+    password: "userbob",
+    role: "user",
+  },
+  {
+    id: 3,
+    name: "Carol",
+    email: "carol@gmail.com",
+    password: "usercarol",
+    role: "user",
+  },
 ];
 
 app.get("/", (_req, res) => {
@@ -27,15 +46,18 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.get("/api/users/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const user = users.find((u) => u.id === id);
+  const email = req.body.email;
+  const user = users.find((u) => u.email === email); // Query from Database
 
   if (!user) {
-    res.status(404).json({ error: `User ${id} not found` });
+    res.status(404).json({ error: `User with email ${email} not found` });
     return;
   }
 
-  res.status(200).json(user);
+  res.status(200).json({
+    id: user.id,
+    name: user.name,
+  });
 });
 
 app.listen(PORT, () => {

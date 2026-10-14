@@ -1,41 +1,20 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
+import helmet from "helmet";
+import { users } from "./dummy_db/users.ts";
 
 const app = express();
 const PORT = 3000;
 
+app.use(helmet());
 app.use(
   cors({
     origin: "http://localhost:5173",
   }),
 );
-
 app.use(express.json());
-
-//Stored in Database
-const users = [
-  {
-    id: 1,
-    name: "Subodh",
-    email: "subodhshah@gmail.com",
-    password: "adminsubodh",
-    role: "admin",
-  },
-  {
-    id: 2,
-    name: "Bob",
-    email: "bob@gmail.com",
-    password: "userbob",
-    role: "user",
-  },
-  {
-    id: 3,
-    name: "Carol",
-    email: "carol@gmail.com",
-    password: "usercarol",
-    role: "user",
-  },
-];
+app.use(cookieParser());
 
 app.get("/", (_req, res) => {
   res.status(200).send(`<h1>Server Listening on PORT ${PORT}</h1>`);

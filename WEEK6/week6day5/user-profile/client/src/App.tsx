@@ -4,12 +4,12 @@ import Register from "./components/Register/Register.tsx";
 import UserProfile from "./components/UserProfile/UserProfile.tsx";
 
 function App() {
-  const [user, setUser] = useState({
+  const user = {
     id: 1,
     name: "Subodh",
     role: "admin",
-  });
-  const [isAuthenticated] = useState(false);
+  };
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [view, setView] = useState<"login" | "register">("login");
 
   return (

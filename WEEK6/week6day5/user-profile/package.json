@@ -8,7 +8,11 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "server": "tsx watch server/src/server.ts"
+    "server": "tsx watch server/src/server.ts",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:reset": "docker compose down -v && docker compose up -d",
+    "db:ps": "docker compose ps"
   },
   "dependencies": {
     "cors": "^2.8.6",

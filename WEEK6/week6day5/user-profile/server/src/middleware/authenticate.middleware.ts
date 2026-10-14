@@ -4,25 +4,21 @@ import { type AuthUser, type AppJwtPayload } from "../types/auth.ts";
 
 const authenticate = (req: Request, res: Response, next: NextFunction) => {
   const authorizationHeader = req.headers.authorization;
-  if (!authorizationHeader) {
+
+  if (!authorizationHeader?.startsWith("Bearer ")) {
     return res.status(401).json({
       success: false,
-      message: "No Authorization header passed",
+      message: "Invalid Authentication Header",
+      code: "INVALID_AUTH",
     });
   }
-  const [authType, authToken] = authorizationHeader?.split(" ");
-  if (authType !== "Bearer" || typeof authToken !== "string") {
-    return res.status(401).json({
-      success: false,
-      message: "Invalid authorization token",
-    });
-  }
+
+  const authToken = authorizationHeader.split(" ")[1];
 
   try {
     const payload = verify(authToken) as AppJwtPayload;
     req.user = {
       id: payload.user.id,
-      email: payload.user.email,
       role: payload.user.role,
     } as AuthUser;
     next();

@@ -2,7 +2,9 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
-import { users } from "./dummy_db/users.ts";
+
+import { pool } from "./config/db.ts";
+import userRoute from "./routes/user.route.js";
 
 const app = express();
 const PORT = 3000;
@@ -20,25 +22,20 @@ app.get("/", (_req, res) => {
   res.status(200).send(`<h1>Server Listening on PORT ${PORT}</h1>`);
 });
 
-app.get("/api/health", (_req, res) => {
-  res.status(200).json({ status: "ok" });
-});
+app.use("/api", userRoute);
 
-app.get("/api/users/:id", (req, res) => {
-  const email = req.body.email;
-  const user = users.find((u) => u.email === email); // Query from Database
-
-  if (!user) {
-    res.status(404).json({ error: `User with email ${email} not found` });
-    return;
+async function startServer() {
+  try {
+    await pool.query("SELECT 1");
+    console.log(`Successfully connected to MySQL Database`);
+    app.listen(PORT, () => {
+      console.log(`Server Listening on PORT ${PORT}`);
+    });
+  } catch (error) {
+    console.log(`Failed to connect to MySQL Database`, error);
+    await pool.end();
+    process.exitCode = 1;
   }
+}
 
-  res.status(200).json({
-    id: user.id,
-    name: user.name,
-  });
-});
-
-app.listen(PORT, () => {
-  console.log(`Server Listening on PORT ${PORT}`);
-});
+startServer();

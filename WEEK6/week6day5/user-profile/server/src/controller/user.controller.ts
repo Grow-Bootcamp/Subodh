@@ -1,7 +1,11 @@
 import { type Request, type Response, type NextFunction } from "express";
 import { users } from "../dummy_db/users.ts"; // import pool
 
-export function getProfile(req: Request, res: Response, next: NextFunction) {
+export const getProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   if (!req.user) {
     return res.status(401).json({
       success: false,
@@ -31,6 +35,25 @@ export function getProfile(req: Request, res: Response, next: NextFunction) {
       },
     });
   } catch (error) {
+    console.log(`Failed to find user profile`);
     next(error);
   }
-}
+};
+
+export const getAllProfile = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const allUsers = [...users]; //Call db here in async manner
+    if (!(allUsers.length > 0)) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No Users Found", code: "NOT_FOUND" });
+    }
+  } catch (error) {
+    console.log(`Failed to find users profile`);
+    next(error);
+  }
+};

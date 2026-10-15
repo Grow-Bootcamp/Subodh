@@ -19,8 +19,8 @@ const authenticate = (req: Request, res: Response, next: NextFunction) => {
   try {
     const payload = jwt.verify(authToken, env.JWT_SECRET) as AppJwtPayload;
     req.user = {
-      id: payload.user.id,
-      role: payload.user.role,
+      id: payload.id,
+      role: payload.role,
     } as AuthUser;
     next();
   } catch (error) {

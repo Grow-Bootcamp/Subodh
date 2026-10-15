@@ -26,7 +26,7 @@ export function login(req: Request, res: Response, next: NextFunction): void {
 
   try {
     const token = jwt.sign(payload, env.JWT_SECRET, {
-      expiresIn: env.JWT_EXPIRES_IN as jwt.SignOptions["expiresIn"],
+      expiresIn: (env.JWT_EXPIRES_IN as jwt.SignOptions["expiresIn"]) ?? "1h",
     });
 
     res.status(201).json({

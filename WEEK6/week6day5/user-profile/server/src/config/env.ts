@@ -2,7 +2,7 @@ import "dotenv/config";
 import { z } from "zod";
 
 const envSchema = z.object({
-  PORT: z.coerce.number().int().positive().default(3000),
+  CLIENT_PORT: z.coerce.number().int().positive().default(3000),
 
   JWT_SECRET: z
     .string({ error: "JWT_ACCESS_SECRET is required" })
@@ -15,6 +15,12 @@ const envSchema = z.object({
   NODE_ENV: z
     .enum(["development", "production", "test"])
     .default("development"),
+
+  DB_NAME: z.string({ error: "DB_NAME is required" }),
+  DB_HOST: z.string({ error: "DB_HOST is required" }),
+  DB_PORT: z.coerce.number().int().positive().default(3306),
+  DB_PASSWORD: z.string({ error: "DB_PASSWORD is required" }),
+  DB_USER: z.string({ error: "DB_USER is required" }),
 });
 
 const parsed = envSchema.safeParse(process.env);

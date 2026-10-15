@@ -1,6 +1,7 @@
 import { type Request, type Response, type NextFunction } from "express";
-import { verify } from "../controller/auth.controller.ts";
 import { type AuthUser, type AppJwtPayload } from "../types/auth.ts";
+import jwt from "jsonwebtoken";
+import { env } from "../config/env.js";
 
 const authenticate = (req: Request, res: Response, next: NextFunction) => {
   const authorizationHeader = req.headers.authorization;
@@ -16,13 +17,14 @@ const authenticate = (req: Request, res: Response, next: NextFunction) => {
   const authToken = authorizationHeader.split(" ")[1];
 
   try {
-    const payload = verify(authToken) as AppJwtPayload;
+    const payload = jwt.verify(authToken, env.JWT_SECRET) as AppJwtPayload;
     req.user = {
       id: payload.user.id,
       role: payload.user.role,
     } as AuthUser;
     next();
   } catch (error) {
+    console.log(`Failed to Authenticate`);
     next(error);
   }
 };

@@ -1,33 +1,42 @@
+import type { NextFunction, Request, Response } from "express";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { env } from "../config/env.js";
+import { users } from "../dummy_db/users.ts";
+import { env } from "../config/env.ts";
+import { type AppJwtPayload } from "../types/auth.ts";
 
-export const sign = (payload: Record<string, any>) => {
-  const secret = env.JWT_SECRET;
-  const expiresIn = process.env.JWT_EXPIRES_IN ?? "1h";
-  if (!secret) {
-    throw new Error("JWT_SECRET_KEY is not defined in environment variables.");
-  }
-  try {
-    const token = jwt.sign(payload, secret, {
-      expiresIn: expiresIn as jwt.SignOptions["expiresIn"],
+export function login(req: Request, res: Response, next: NextFunction): void {
+  const { email, password } = req.body;
+  const user = users.find(
+    (u) => u.email === email && bcrypt.compare(password, u.passwordHash),
+  );
+  if (!user) {
+    res.status(401).json({
+      success: false,
+      message: "User not found",
+      code: "NOT_FOUND",
     });
-    return token;
-  } catch (error) {
-    console.error("Failed to sign JWT:", error);
-    throw error;
+    return;
   }
-};
 
-export const verify = (token: string) => {
-  const secret = process.env.JWT_SECRET_KEY;
-  if (!secret) {
-    throw new Error("JWT_SECRET_KEY is not defined in environment variables.");
-  }
+  const payload: AppJwtPayload = {
+    id: user?.id?.toString(),
+    role: user?.role,
+  };
+
   try {
-    const payload = jwt.verify(token, secret);
-    return payload;
+    const token = jwt.sign(payload, env.JWT_SECRET, {
+      expiresIn: env.JWT_EXPIRES_IN as jwt.SignOptions["expiresIn"],
+    });
+
+    res.status(201).json({
+      success: true,
+      token,
+      message: "User login successfully",
+      code: "LOGIN_SUCCESS",
+    });
   } catch (error) {
-    console.error("Failed to sign JWT:", error);
-    throw error;
+    console.log(`Failed to login the user`);
+    next(error);
   }
-};
+}

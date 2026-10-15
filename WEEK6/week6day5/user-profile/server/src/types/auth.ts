@@ -16,7 +16,10 @@ export interface AuthUser {
  * Extends the library's JwtPayload so standard claims (iat, exp, iss, ...) are typed.
  */
 export interface AppJwtPayload extends JwtPayload {
-  user: AuthUser;
+  id: string;
+  role: string;
+  email?: string;
+  name?: string;
   iat?: number; // issued at (seconds since epoch)
   exp?: number; // expiration time (seconds since epoch)
   iss?: string; // optional issuer claim for additional security

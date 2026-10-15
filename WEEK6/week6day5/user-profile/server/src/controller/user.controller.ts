@@ -1,5 +1,5 @@
 import { type Request, type Response, type NextFunction } from "express";
-import { users } from "../dummy_db/users.ts"; // import pool
+import { pool } from "../config/db.ts";
 
 export const getProfile = async (
   req: Request,
@@ -14,10 +14,13 @@ export const getProfile = async (
     });
   }
 
-  const userId = Number(req.user?.id);
-  const userRole = req.user.role;
+  const userId = Number(req.user.id);
   try {
-    const user = users.find((u) => u.id === userId && u.role === userRole); // DB call with await
+    const [rows] = await pool.query(
+      "SELECT id, name, role FROM users WHERE id = ?",
+      [userId],
+    );
+    const user = (rows as { id: number; name: string; role: string }[])[0];
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -45,7 +48,15 @@ export const getAllProfile = async (
   next: NextFunction,
 ) => {
   try {
-    const allUsers = [...users]; //Call db here in async manner
+    const [rows] = await pool.query(
+      "SELECT id, name, email, role FROM users",
+    );
+    const allUsers = rows as {
+      id: number;
+      name: string;
+      email: string;
+      role: string;
+    }[];
     if (!(allUsers.length > 0)) {
       return res
         .status(404)

@@ -23,9 +23,13 @@ const authenticate = (req: Request, res: Response, next: NextFunction) => {
       role: payload.role,
     } as AuthUser;
     next();
-  } catch (error) {
+  } catch {
     console.log(`Failed to Authenticate`);
-    next(error);
+    return res.status(401).json({
+      success: false,
+      message: "Invalid or expired token",
+      code: "INVALID_TOKEN",
+    });
   }
 };
 

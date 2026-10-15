@@ -30,7 +30,6 @@ export const getProfile = async (
       user: {
         id: user.id,
         name: user.name,
-        email: user.email,
         role: user.role,
       },
     });
@@ -52,6 +51,7 @@ export const getAllProfile = async (
         .status(404)
         .json({ success: false, message: "No Users Found", code: "NOT_FOUND" });
     }
+    res.status(200).json({ success: true, users: allUsers });
   } catch (error) {
     console.log(`Failed to find users profile`);
     next(error);

@@ -1,49 +1,68 @@
 import styles from "./Login.module.css";
+import { useState, type SubmitEvent } from "react";
 
 type LoginProps = {
   onSwitchToRegister: () => void;
+  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const Login = ({ onSwitchToRegister }: LoginProps) => {
-  const serverUrl = "http://localhost:3000/";
+const API_URL = `${import.meta.env.VITE_API_URL}/api/users/login`;
 
-  function handleSubmit(e: any) {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const userName = formData.get("userName") as string;
-    const userEmail = formData.get("userEmail") as string;
-    const userPassword = String(formData.get("userPassword"));
-    const userRole = formData.get("userRole") as string;
+async function postLoginData(email: string, password: string) {
+  try {
+    const response = await fetch(`${API_URL}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await response.json();
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || "Failed to login");
+    }
+    return data.token;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`[${message}]`, error);
+    throw error;
+  }
+}
+
+const Login = ({ onSwitchToRegister, setIsAuthenticated }: LoginProps) => {
+  const [error, setError] = useState<string>("");
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+    const controller = new AbortController();
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get("userEmail")?.toString();
+    const password = formData.get("userPassword")?.toString();
 
     if (
-      !userName ||
-      !userEmail ||
-      !userPassword ||
-      !userRole ||
-      userPassword.length > 12
+      typeof email !== "string" ||
+      typeof password !== "string" ||
+      email.trim().length === 0 ||
+      password.length < 8
     ) {
-      alert("Enter valid user credentials");
+      console.log("It is running");
+      setError("Invalid_Credentials");
       return;
     }
 
-    async function postUserData(name: string, email: string, role: string) {
-      const controller = new AbortController();
-      try {
-        await fetch(`${serverUrl}`, {
-          method: "POST",
-          signal: controller.signal,
-          body: JSON.stringify({ name, email, role }),
-        });
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        console.error(`[${message}]`, error);
-      } finally {
-        controller.abort();
-        console.log(`Cleaning up ...`);
-      }
-    }
+    try {
+      console.log("This is also running");
+      const token = await postLoginData(email, password);
 
-    postUserData(userName, userEmail, userRole);
+      localStorage.setItem("token", token);
+      setIsAuthenticated(true);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error(`[${message}]`, error);
+      alert(message);
+    } finally {
+      console.log(`Cleaning up ...`);
+      controller.abort();
+    }
   }
 
   return (
@@ -66,6 +85,7 @@ const Login = ({ onSwitchToRegister }: LoginProps) => {
           className={styles.input}
           type="password"
           name="userPassword"
+          min="8"
           placeholder="••••••••"
         />
       </label>
@@ -79,7 +99,7 @@ const Login = ({ onSwitchToRegister }: LoginProps) => {
           Forgot password?
         </a>
       </div>
-
+      {error && <p style={{ color: "red" }}>{error}</p>}
       <button type="submit" className={styles.button}>
         Login
       </button>

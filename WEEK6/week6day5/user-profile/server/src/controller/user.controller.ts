@@ -49,7 +49,7 @@ export const getAllProfile = async (
 ) => {
   try {
     const [rows] = await pool.query(
-      "SELECT id, name, email, role FROM users",
+      "SELECT id, name, email, role FROM users LIMIT 10",
     );
     const allUsers = rows as {
       id: number;

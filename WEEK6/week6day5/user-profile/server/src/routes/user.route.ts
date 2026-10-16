@@ -11,7 +11,7 @@ const router = Router();
 router.get("/users/profile/user", authenticate, getProfile);
 
 router.get(
-  "/users/profiles/admin",
+  "/users/profile/admin",
   authenticate,
   authorize(Roles.ADMIN),
   getAllProfile,

@@ -4,6 +4,7 @@ import Register from "./components/Register/Register.tsx";
 import UserProfile, {
   type User,
 } from "./components/UserProfile/UserProfile.tsx";
+import AdminUserList from "./components/AdminUserList/AdminUserList.tsx";
 
 const API_URL = `${import.meta.env.VITE_API_URL}/api/users/profile/user`;
 
@@ -55,7 +56,10 @@ function App() {
     <div className="app">
       {isAuthenticated ? (
         user ? (
-          <UserProfile user={user} />
+          <>
+            <UserProfile user={user} />
+            {user.role === "admin" && <AdminUserList />}
+          </>
         ) : (
           <p>Loading profile…</p>
         )

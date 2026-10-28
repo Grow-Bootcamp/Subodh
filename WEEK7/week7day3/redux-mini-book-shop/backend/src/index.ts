@@ -1,4 +1,5 @@
 import express, { type Request, type Response } from "express";
+import cors from "cors";
 
 type Product = {
   id: string;
@@ -9,6 +10,7 @@ type Product = {
 const app = express();
 const PORT = Number(process.env.PORT ?? 4000);
 
+app.use(cors());
 app.use(express.json());
 
 const products: Product[] = [

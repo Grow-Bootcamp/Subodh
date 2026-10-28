@@ -16,7 +16,8 @@ export default function ProductList() {
     async function loadProducts() {
       try {
         const response = await fetch("/api/products");
-        if (!response.ok) {
+        const contentType = response.headers.get("content-type");
+        if (!response.ok || !contentType?.includes("application/json")) {
           throw new Error("The server could not load the books.");
         }
 

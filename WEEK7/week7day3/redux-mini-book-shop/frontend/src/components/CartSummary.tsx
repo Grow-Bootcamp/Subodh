@@ -52,13 +52,13 @@ const CartSummary = () => {
                     +
                   </button>
                 </div>
-                <button
-                  className="text-button"
-                  onClick={() => dispatch(removeFromCart(item.id))}
-                >
-                  Remove
-                </button>
               </div>
+              <button
+                className="text-button"
+                onClick={() => dispatch(removeFromCart(item.id))}
+              >
+                Remove
+              </button>
               <strong className="line-total">
                 ${(item.price * item.quantity).toFixed(2)}
               </strong>

@@ -20,8 +20,18 @@ const secret = process.env.JWT_SECRET;
 if (!secret) throw new Error("Set JWT_SECRET in backend/.env first.");
 
 const users: DemoUser[] = [
-  { id: "1", username: "learner", role: "user", passwordHash: bcrypt.hashSync("user123", 10) },
-  { id: "2", username: "admin", role: "admin", passwordHash: bcrypt.hashSync("admin123", 10) },
+  {
+    id: "1",
+    username: "learner",
+    role: "user",
+    passwordHash: bcrypt.hashSync("user123", 10),
+  },
+  {
+    id: "2",
+    username: "admin",
+    role: "admin",
+    passwordHash: bcrypt.hashSync("admin123", 10),
+  },
 ];
 
 const app = express();
@@ -74,7 +84,9 @@ app.post("/api/auth/login", async (req, res) => {
     typeof req.body?.password === "string" ? req.body.password : "";
 
   if (!username || !password) {
-    return res.status(400).json({ message: "Username and password are required." });
+    return res
+      .status(400)
+      .json({ message: "Username and password are required." });
   }
 
   const user = users.find((entry) => entry.username === username);
@@ -82,11 +94,10 @@ app.post("/api/auth/login", async (req, res) => {
     return res.status(401).json({ message: "Incorrect username or password." });
   }
 
-  const token = jwt.sign(
-    { username: user.username, role: user.role },
-    secret,
-    { subject: user.id, expiresIn: "1h" },
-  );
+  const token = jwt.sign({ username: user.username, role: user.role }, secret, {
+    subject: user.id,
+    expiresIn: "1h",
+  });
 
   return res.json({
     token,

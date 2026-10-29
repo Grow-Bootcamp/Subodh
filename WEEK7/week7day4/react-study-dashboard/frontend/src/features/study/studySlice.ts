@@ -1,5 +1,4 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { Session } from "inspector";
 
 export type StudySession = {
   id: string;

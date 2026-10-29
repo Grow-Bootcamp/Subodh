@@ -4,7 +4,7 @@ import cors from "cors";
 const app = express();
 const PORT = 4000;
 
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cors());
 app.use(express.json());
 
 export type StudySession = {
@@ -26,7 +26,11 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
-app.get("/api/study-sessions", (_req, res) => {
+console.log(`Running outside study sessions api`);
+
+app.get("/api/study/sessions", (req, res) => {
+  console.log(`Running inside`);
+  console.log(req.baseUrl);
   res.json(sampleSessions);
 });
 

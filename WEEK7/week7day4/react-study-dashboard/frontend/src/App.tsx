@@ -1,5 +1,10 @@
-const App = () => {
-  return <div>App</div>;
-};
+import "./App.css";
+import DashBoard from "./components/DashBoard";
 
-export default App;
+export default function App() {
+  return (
+    <>
+      <DashBoard />
+    </>
+  );
+}

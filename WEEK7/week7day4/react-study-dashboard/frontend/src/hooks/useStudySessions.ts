@@ -7,7 +7,7 @@ import {
   type StudySession,
 } from "../features/study/studySlice";
 
-export function useStudySession() {
+export function useStudySessions() {
   const dispatch = useAppDispatch();
   const sessions = useAppSelector((state) => state.study.sessions);
   const loading = useAppSelector((state) => state.study.loading);
@@ -23,7 +23,7 @@ export function useStudySession() {
       dispatch(setLoading());
       try {
         const response = await fetch(
-          "http://localhost:4000/api/study-sessions",
+          "http://localhost:4000/api/study/sessions",
           {
             signal: controller.signal,
           },

@@ -1,0 +1,211 @@
+#root {
+  min-height: 100vh;
+}
+
+.page-shell {
+  width: min(100% - 2rem, 700px);
+  margin: 0 auto;
+  padding: 3.5rem 0;
+}
+
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.5rem;
+  color: #5b50cc;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 3rem);
+  letter-spacing: -0.045em;
+}
+
+h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.35rem;
+}
+
+.page-header > p:last-child,
+.muted,
+.page-footnote {
+  color: #68738a;
+  line-height: 1.6;
+}
+
+.form-card,
+.success-card {
+  padding: clamp(1.25rem, 4vw, 2rem);
+  background: #fff;
+  border: 1px solid #e2e7f0;
+  border-radius: 16px;
+  box-shadow: 0 12px 36px rgb(24 38 72 / 6%);
+}
+
+.progress-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.65rem;
+  color: #59647a;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.progress-track {
+  height: 7px;
+  overflow: hidden;
+  margin-bottom: 1.75rem;
+  background: #e8eaf3;
+  border-radius: 999px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #6255d9;
+  border-radius: inherit;
+  transition: width 180ms ease;
+}
+
+.step-content > .muted {
+  margin: 0 0 1.5rem;
+}
+
+.form-field {
+  display: grid;
+  gap: 0.45rem;
+  margin-bottom: 1.15rem;
+}
+
+.form-field label {
+  font-size: 0.925rem;
+  font-weight: 700;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 0.8rem 0.9rem;
+  color: #1c2434;
+  background: #fff;
+  border: 1px solid #d5dbea;
+  border-radius: 9px;
+}
+
+.form-field textarea {
+  resize: vertical;
+}
+
+.form-field [aria-invalid="true"] {
+  border-color: #c73547;
+}
+
+.field-error {
+  margin: 0;
+  color: #b42335;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.field-hint {
+  margin: 0;
+  color: #68738a;
+  font-size: 0.8rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #edf0f5;
+}
+
+.button-primary,
+.button-secondary,
+.success-card button {
+  padding: 0.75rem 1rem;
+  border: 0;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.button-primary,
+.success-card button {
+  color: #fff;
+  background: #6255d9;
+}
+
+.button-secondary {
+  color: #30394d;
+  background: #edf0f7;
+}
+
+.review-card > p,
+.success-card > p {
+  color: #68738a;
+  line-height: 1.6;
+}
+
+.review-list {
+  margin: 1.25rem 0 0;
+}
+
+.review-list > div {
+  padding: 0.9rem 0;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.review-list dt {
+  margin-bottom: 0.25rem;
+  color: #68738a;
+  font-size: 0.85rem;
+}
+
+.review-list dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.loading-message {
+  padding: 2rem 0;
+  color: #59647a;
+}
+
+.success-card h1 {
+  margin-bottom: 1rem;
+}
+
+.success-card button {
+  margin-top: 0.75rem;
+}
+
+.page-footnote {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+@media (max-width: 520px) {
+  .page-shell {
+    padding-top: 2rem;
+  }
+
+  .form-actions {
+    flex-wrap: wrap;
+  }
+
+  .form-actions button {
+    flex: 1;
+  }
+}

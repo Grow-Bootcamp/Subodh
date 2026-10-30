@@ -1,6 +1,6 @@
 import "./App.css";
 import { lazy, Suspense, useCallback, useState } from "react";
-import FormField, { type TextFieldName } from "./components/FormField";
+import FormField from "./components/FormField";
 
 const RegistrationSummary = lazy(
   () => import("./components/RegistrationSummary"),

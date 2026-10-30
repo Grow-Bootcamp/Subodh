@@ -1,6 +1,6 @@
 import { memo } from "react";
 
-export type TextFieldName = "fullname" | "email";
+export type TextFieldName = "fullName" | "email";
 
 type FormFieldProps = {
   name: TextFieldName;
